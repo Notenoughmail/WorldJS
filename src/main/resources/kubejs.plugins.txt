@@ -1,0 +1,2 @@
+io.github.notenoughmail.worldjs.WorldJSPlugin
+io.github.notenoughmail.worldjs.WorldJSProbePlugin probejs
