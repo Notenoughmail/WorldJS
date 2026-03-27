@@ -135,10 +135,10 @@ public class WorldJS {
                                 "ySpread"
                         },
                         o -> {
-                            final IntProvider p0 = intProvider(o[0]), p1 = intProvider(o[1]);
-                            if (p0.getMinValue() < -16 || p1.getMinValue() < -16 || p0.getMaxValue() > 16 || p1.getMaxValue() > 16)
+                            final IntProvider xz = intProvider(o[0]), y = intProvider(o[1]);
+                            if (xz.getMinValue() < -16 || y.getMinValue() < -16 || xz.getMaxValue() > 16 || y.getMaxValue() > 16)
                                 throw new IllegalArgumentException("'xzSpread' and 'ySpread' must have max ranges of [-16, 16]");
-                            return RandomOffsetPlacement.of(p0, p1);
+                            return RandomOffsetPlacement.of(xz, y);
                         }
                 )
                 .<IntProvider>registerSingleArg(

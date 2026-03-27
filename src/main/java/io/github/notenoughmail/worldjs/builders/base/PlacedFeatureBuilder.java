@@ -8,6 +8,7 @@ import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.CustomJavaToJsWrapper;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
@@ -27,14 +28,22 @@ import java.util.function.Consumer;
 public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
 
     public transient final List<PlacementModifier> modifiers;
-    public transient ResourceKey<ConfiguredFeature<?, ?>> configuredFeature;
+    public transient Holder.Reference<ConfiguredFeature<?, ?>> configuredFeature;
 
     public PlacedFeatureBuilder(ResourceLocation id) {
         super(id);
         modifiers = new ArrayList<>();
     }
 
-    public PlacedFeatureBuilder configuredFeature(ResourceKey<ConfiguredFeature<?, ?>> feature) {
+    @HideFromJS
+    public void configuredFeature(ConfiguredFeatureBuilder<?, ?> configuredFeatureBuilder) {
+        configuredFeature = Holder.Reference.createStandAlone(
+                RegistryAccessContainer.current.access().lookupOrThrow(Registries.CONFIGURED_FEATURE),
+                ResourceKey.create(Registries.CONFIGURED_FEATURE, configuredFeatureBuilder.id)
+        );
+    }
+
+    public PlacedFeatureBuilder configuredFeature(Holder.Reference<ConfiguredFeature<?, ?>> feature) {
         configuredFeature = feature;
         return this;
     }
@@ -56,9 +65,9 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
     @Override
     public PlacedFeature createObject() {
         return new PlacedFeature(
-                Holder.Reference.createStandAlone(
-                        RegistryAccessContainer.current.access().lookupOrThrow(Registries.CONFIGURED_FEATURE),
-                        Objects.requireNonNull(configuredFeature, () -> "Placed feature '%s' must define a configured feature to place".formatted(id))
+                Objects.requireNonNull(
+                        configuredFeature,
+                        () -> "Placed feature '%s' must define a configured feature to place".formatted(id)
                 ),
                 modifiers
         );
