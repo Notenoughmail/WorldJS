@@ -13,20 +13,32 @@ import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.bm.*;
-import io.github.notenoughmail.worldjs.builders.cf.FossilConfigurationBuilder;
-import io.github.notenoughmail.worldjs.builders.cf.RandomPatchBuilder;
-import io.github.notenoughmail.worldjs.builders.cf.SpringConfigurationBuilder;
+import io.github.notenoughmail.worldjs.builders.cf.*;
 import io.github.notenoughmail.worldjs.util.WeightedValue;
+import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.rootplacers.RootPlacer;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
+import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class WorldJSPlugin implements KubeJSPlugin {
 
@@ -53,14 +65,34 @@ public class WorldJSPlugin implements KubeJSPlugin {
             cf(c, "weeping_vines", Feature.WEEPING_VINES);
             cf(c, "basalt_pillar", Feature.BASALT_PILLAR);
             cf(c, "bonus_chest", Feature.BONUS_CHEST);
-            // Tree
-            cf(c, "flower", RandomPatchBuilder.class, RandomPatchBuilder.factory(Feature.FLOWER));
-            cf(c, "no_bonemeal_flower", RandomPatchBuilder.class, RandomPatchBuilder.factory(Feature.NO_BONEMEAL_FLOWER));
-            cf(c, "random_patch", RandomPatchBuilder.class, RandomPatchBuilder.factory(Feature.RANDOM_PATCH));
-            // Block pile
+            cf(c, "tree", TreeConfigurationBuilder.class, TreeConfigurationBuilder::new);
+            cf(c, "flower", RandomPatchConfigurationBuilder.class, Feature.FLOWER, RandomPatchConfigurationBuilder::new);
+            cf(c, "no_bonemeal_flower", RandomPatchConfigurationBuilder.class, Feature.NO_BONEMEAL_FLOWER, RandomPatchConfigurationBuilder::new);
+            cf(c, "random_patch", RandomPatchConfigurationBuilder.class, Feature.RANDOM_PATCH, RandomPatchConfigurationBuilder::new);
+            cf(c, "block_pile", BlockPileConfigurationBuilder.class, BlockPileConfigurationBuilder::new);
             cf(c, "spring", SpringConfigurationBuilder.class, SpringConfigurationBuilder::new);
-            // Replace single block
+            cf(c, "replace_single_block", ReplaceBlockConfigurationBuilder.class, ReplaceBlockConfigurationBuilder::new);
             cf(c, "fossil", FossilConfigurationBuilder.class, FossilConfigurationBuilder::new);
+            cf(c, "huge_red_mushroom", HugeMushroomConfigurationBuilder.class, Feature.HUGE_RED_MUSHROOM, HugeMushroomConfigurationBuilder::new);
+            cf(c, "huge_brown_mushroom", HugeMushroomConfigurationBuilder.class, Feature.HUGE_BROWN_MUSHROOM, HugeMushroomConfigurationBuilder::new);
+            cf(c, "block_column", BlockColumnConfigurationBuilder.class, BlockColumnConfigurationBuilder::new);
+            cf(c, "vegetation_patch", VegetationPatchConfigurationBuilder.class, Feature.VEGETATION_PATCH, VegetationPatchConfigurationBuilder::new);
+            cf(c, "waterlogged_vegetation_patch", VegetationPatchConfigurationBuilder.class, Feature.WATERLOGGED_VEGETATION_PATCH, VegetationPatchConfigurationBuilder::new);
+            cf(c, "root_system", RootSystemConfigurationBuilder.class, RootSystemConfigurationBuilder::new);
+            cf(c, "multiface_growth", MultifaceGrowthConfigurationBuilder.class, MultifaceGrowthConfigurationBuilder::new);
+            cf(c, "underwater_magma", UnderwaterMagmaConfigurationBuilder.class, UnderwaterMagmaConfigurationBuilder::new);
+            cf(c, "iceberg", BlockStateConfigurationBuilder.class, Feature.ICEBERG, BlockStateConfigurationBuilder::new);
+            cf(c, "forest_rock", BlockStateConfigurationBuilder.class, Feature.FOREST_ROCK, BlockStateConfigurationBuilder::new);
+            cf(c, "disk", DiskConfigurationBuilder.class, DiskConfigurationBuilder::new);
+            cf(c, "lake", LakeConfigurationBuilder.class, LakeConfigurationBuilder::new);
+            cf(c, "ore", OreConfigurationBuilder.class, OreConfigurationBuilder::new);
+            cf(c, "end_spike", SpikeConfigurationBuilder.class, SpikeConfigurationBuilder::new);
+            cf(c, "end_gateway", EndGatewayConfigurationBuilder.class, EndGatewayConfigurationBuilder::new);
+            cf(c, "seagrass", ProbabilityFeatureConfigurationBuilder.class, Feature.SEAGRASS, ProbabilityFeatureConfigurationBuilder::new);
+            cf(c, "sea_pickle", CountConfigurationBuilder.class, CountConfigurationBuilder::new);
+            cf(c, "simple_block", SimpleBlockConfigurationBuilder.class, SimpleBlockConfigurationBuilder::new);
+            cf(c, "bamboo", ProbabilityFeatureConfigurationBuilder.class, Feature.BAMBOO, ProbabilityFeatureConfigurationBuilder::new);
+            cf(c, "huge_fungus", HugeFungusConfigurationBuilder.class, HugeFungusConfigurationBuilder::new);
             // TODO: 1.0.0 | All the rest...
         });
         registry.of(NeoForgeRegistries.Keys.BIOME_MODIFIERS, c -> {
@@ -79,12 +111,16 @@ public class WorldJSPlugin implements KubeJSPlugin {
         callback.add(id, builderType, factory);
     }
 
-    private static <C extends ConfiguredFeatureBuilder<?, ?>> void cf(BuilderTypeRegistry.Callback<ConfiguredFeature<?, ?>> callback, String name, Class<C> builderType, BuilderFactory factory) {
+    private static <C extends ConfiguredFeatureBuilder<FC>, FC extends FeatureConfiguration> void cf(BuilderTypeRegistry.Callback<ConfiguredFeature<?, ?>> callback, String name, Class<C> builderType, Feature<FC> feature, BiFunction<ResourceLocation, Supplier<Feature<FC>>, ? extends C> factory) {
+        cf(callback, name, builderType, ConfiguredFeatureBuilder.factory(feature, factory));
+    }
+
+    private static <C extends ConfiguredFeatureBuilder<?>> void cf(BuilderTypeRegistry.Callback<ConfiguredFeature<?, ?>> callback, String name, Class<C> builderType, BuilderFactory factory) {
         add(callback, KubeJS.id(name), builderType, factory);
     }
 
     private static <F extends Feature<NoneFeatureConfiguration>> void cf(BuilderTypeRegistry.Callback<ConfiguredFeature<?, ?>> callback, String name, F feature) {
-        cf(callback, name, ConfiguredFeatureBuilder.NoneConfig.class, ConfiguredFeatureBuilder.NoneConfig.factory(feature));
+        cf(callback, name, ConfiguredFeatureBuilder.NoneConfig.class, feature, ConfiguredFeatureBuilder.NoneConfig::new);
     }
 
     private static <M extends BiomeModifier, B extends BiomeModifierBuilder<M>> void bm(BuilderTypeRegistry.Callback<BiomeModifier> callback, String name, Class<B> builderType, Function<ResourceLocation, B> factory) {
@@ -94,6 +130,16 @@ public class WorldJSPlugin implements KubeJSPlugin {
     @Override
     public void registerTypeWrappers(TypeWrapperRegistry registry) {
         registry.register(WeightedValue.class, WeightedValue::wrap);
+        registry.register(BlockStateProvider.class, Wrappers::blockStateProvider);
+        registry.register(VerticalAnchor.class, Wrappers::verticalAnchor);
+        registry.register(HeightProvider.class, Wrappers::heightProvider);
+        registry.registerCodec(TrunkPlacer.class, TrunkPlacer.CODEC);
+        registry.registerCodec(FoliagePlacer.class, FoliagePlacer.CODEC);
+        registry.registerCodec(RootPlacer.class, RootPlacer.CODEC);
+        registry.registerCodec(FeatureSize.class, FeatureSize.CODEC);
+        registry.registerCodec(TreeDecorator.class, TreeDecorator.CODEC);
+        registry.registerAlias(OreConfiguration.TargetBlockState.class, Wrappers.TargetBlockState.class, Wrappers.TargetBlockState::convert);
+        registry.registerCodec(BlockPredicate.class, BlockPredicate.CODEC);
     }
 
     @Override

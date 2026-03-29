@@ -2,6 +2,7 @@ package io.github.notenoughmail.worldjs.builders.base;
 
 import com.google.gson.JsonElement;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
+import dev.latvian.mods.kubejs.util.Lazy;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.NativeJavaObject;
@@ -10,7 +11,6 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.CustomJavaToJsWrapper;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent;
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -36,7 +36,7 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
     }
 
     @HideFromJS
-    public void configuredFeature(ConfiguredFeatureBuilder<?, ?> configuredFeatureBuilder) {
+    public void configuredFeature(ConfiguredFeatureBuilder<?> configuredFeatureBuilder) {
         configuredFeature = Holder.Reference.createStandAlone(
                 RegistryAccessContainer.current.access().lookupOrThrow(Registries.CONFIGURED_FEATURE),
                 ResourceKey.create(Registries.CONFIGURED_FEATURE, configuredFeatureBuilder.id)
@@ -58,7 +58,7 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
     }
 
     public PlacedFeatureBuilder modifiers(Consumer<Modifiers> modifiers) {
-        Util.make(new Modifiers(), modifiers);
+        Modifiers.accept(this::modifier, modifiers);
         return this;
     }
 
@@ -73,9 +73,22 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
         );
     }
 
-    public class Modifiers implements CustomJavaToJsWrapper {
+    public enum Modifiers implements CustomJavaToJsWrapper {
+        INSTANCE;
 
-        private final Map<String, PlacedFeatureModifierEvent.ModifierNamespace> namespaces = PlacedFeatureModifierEvent.getNamespaces(modifiers::add);
+        public static Consumer<PlacementModifier> modifierRet;
+
+        public static final Lazy<Map<String, PlacedFeatureModifierEvent.ModifierNamespace>> NAMESPACES = Lazy.of(PlacedFeatureModifierEvent::createNamespaces);
+
+        public static void accept(Consumer<PlacementModifier> ret, Consumer<Modifiers> source) {
+            modifierRet = ret;
+            source.accept(INSTANCE);
+            modifierRet = null;
+        }
+
+        public static void accept(PlacementModifier mod) {
+            if (modifierRet != null) modifierRet.accept(mod);
+        }
 
         @Override
         public Scriptable convertJavaToJs(Context cx, Scriptable scope, TypeInfo staticType) {
@@ -83,7 +96,7 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
 
                 @Override
                 public Object get(Context cx, String name, Scriptable start) {
-                    final PlacedFeatureModifierEvent.ModifierNamespace namespace = namespaces.get(name);
+                    final PlacedFeatureModifierEvent.ModifierNamespace namespace = NAMESPACES.get().get(name);
                     if (namespace != null) return namespace;
                     return super.get(cx, name, start);
                 }

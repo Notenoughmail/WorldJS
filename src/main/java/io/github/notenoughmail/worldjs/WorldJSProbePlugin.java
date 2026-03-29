@@ -24,7 +24,7 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
 
-        final Map<String, ModifierNamespace> modifiers = PlacedFeatureModifierEvent.getNamespaces(m -> {});
+        final Map<String, ModifierNamespace> modifiers = PlacedFeatureBuilder.Modifiers.NAMESPACES.get();
 
         final ClassDecl.Builder modifiersBuilder = Statements.clazz(MODIFIER_HOLDER.getName());
 

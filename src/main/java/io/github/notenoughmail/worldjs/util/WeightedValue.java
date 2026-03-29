@@ -57,7 +57,11 @@ public record WeightedValue<T>(int weight, T value) {
         };
     }
 
-    private static final RecordTypeInfo TYPE = Cast.to(TypeInfo.of(WeightedValue.class));
+    public static TypeInfo listType(TypeInfo generic) {
+        return TypeInfo.RAW_LIST.withParams(TYPE.withParams(generic));
+    }
+
+    public static final RecordTypeInfo TYPE = Cast.to(TypeInfo.of(WeightedValue.class));
     private static final TypeInfo CONSUMER_TYPE = TypeInfo.RAW_CONSUMER.withParams(TypeInfo.RAW_MAP.withParams(TypeInfo.STRING, TypeInfo.NONE));
 
     public static WeightedValue<?> wrap(Context ctx, Object from, TypeInfo target) {

@@ -12,7 +12,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.SpringConfigura
 import net.minecraft.world.level.material.FluidState;
 
 @ReturnsSelf
-public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringConfiguration, Feature<SpringConfiguration>> {
+public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringConfiguration> {
 
     public transient FluidState fluidState;
     public transient boolean requiresRockBelow;

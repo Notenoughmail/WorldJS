@@ -11,7 +11,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import java.util.List;
 
 @ReturnsSelf
-public class FossilConfigurationBuilder extends ConfiguredFeatureBuilder<FossilFeatureConfiguration, Feature<FossilFeatureConfiguration>> {
+public class FossilConfigurationBuilder extends ConfiguredFeatureBuilder<FossilFeatureConfiguration> {
 
     public transient List<ResourceLocation> fossilStructures, overlayStructures;
     public transient Holder.Reference<StructureProcessorList> fossilProcessors, overlayProcessors;
@@ -54,8 +54,8 @@ public class FossilConfigurationBuilder extends ConfiguredFeatureBuilder<FossilF
         return new FossilFeatureConfiguration(
                 fossilStructures,
                 overlayStructures,
-                fossilProcessors,
-                overlayProcessors,
+                notNull(fossilProcessors, "Fossil processors must not be null!"),
+                notNull(overlayProcessors, "Overlay processors mut not be null!"),
                 maxEmptyCornersAllowed
         );
     }

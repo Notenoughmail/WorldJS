@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs;
 import com.mojang.logging.LogUtils;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -27,13 +28,9 @@ public class WorldJS {
         NeoForge.EVENT_BUS.addListener(this::addVanillaPlacementModifiers);
     }
 
-    private static final TypeInfo INT_PROVIDER = TypeInfo.of(IntProvider.class);
-    // TODO: 1.0.0 | Needs a wrapper
     private static final TypeInfo BLOCK_PREDICATE = TypeInfo.of(BlockPredicate.class);
     private static final TypeInfo DIRECTION = TypeInfo.of(Direction.class);
     private static final TypeInfo HEIGHTMAP = TypeInfo.of(Heightmap.Types.class);
-    // TODO: 1.0.0 | Needs a wrapper, as does height provider
-    private static final TypeInfo VERTICAL_ANCHOR = TypeInfo.of(VerticalAnchor.class);
 
     private void addVanillaPlacementModifiers(PlacedFeatureModifierEvent event) {
         event.namespace("minecraft")
@@ -41,7 +38,7 @@ public class WorldJS {
                 .unit("inSquare", InSquarePlacement.spread())
                 .<IntProvider>registerSingleArg(
                         "count",
-                        INT_PROVIDER,
+                        Wrappers.INT_PROVIDER,
                         "count",
                         CountPlacement::of
                 )
@@ -127,8 +124,8 @@ public class WorldJS {
                 .register(
                         "randomOffset",
                         new TypeInfo[] {
-                                INT_PROVIDER,
-                                INT_PROVIDER
+                                Wrappers.INT_PROVIDER,
+                                Wrappers.INT_PROVIDER
                         },
                         new String[] {
                                 "xzSpread",
@@ -137,13 +134,13 @@ public class WorldJS {
                         o -> {
                             final IntProvider xz = intProvider(o[0]), y = intProvider(o[1]);
                             if (xz.getMinValue() < -16 || y.getMinValue() < -16 || xz.getMaxValue() > 16 || y.getMaxValue() > 16)
-                                throw new IllegalArgumentException("'xzSpread' and 'ySpread' must have max ranges of [-16, 16]");
+                                throw new IllegalArgumentException("'xzSpread' and 'ySpread' must be in range [-16, 16]");
                             return RandomOffsetPlacement.of(xz, y);
                         }
                 )
                 .<IntProvider>registerSingleArg(
                         "verticalRandomOffset",
-                        INT_PROVIDER,
+                        Wrappers.INT_PROVIDER,
                         "ySpread",
                         i -> {
                             if (i.getMinValue() < -16 || i.getMaxValue() > 16)
@@ -153,7 +150,7 @@ public class WorldJS {
                 )
                 .<IntProvider>registerSingleArg(
                         "horizontalRandomOffset",
-                        INT_PROVIDER,
+                        Wrappers.INT_PROVIDER,
                         "xzSpread",
                         i -> {
                             if (i.getMinValue() < -16 || i.getMaxValue() > 16)
@@ -163,7 +160,7 @@ public class WorldJS {
                 )
                 .<IntProvider>registerSingleArg(
                         "countOnEveryLayer",
-                        INT_PROVIDER,
+                        Wrappers.INT_PROVIDER,
                         "count",
                         i -> {
                             if (i.getMinValue() < 0 || i.getMaxValue() > 256)
@@ -299,8 +296,8 @@ public class WorldJS {
                 .register(
                         "uniformHeightRange",
                         new TypeInfo[] {
-                                VERTICAL_ANCHOR,
-                                VERTICAL_ANCHOR
+                                Wrappers.VERTICAL_ANCHOR,
+                                Wrappers.VERTICAL_ANCHOR
                         },
                         new String[] {
                                 "minInclusive",
@@ -314,8 +311,8 @@ public class WorldJS {
                 .register(
                         "triangleHeightRange",
                         new TypeInfo[] {
-                                VERTICAL_ANCHOR,
-                                VERTICAL_ANCHOR
+                                Wrappers.VERTICAL_ANCHOR,
+                                Wrappers.VERTICAL_ANCHOR
                         },
                         new String[] {
                                 "minInclusive",
@@ -328,7 +325,7 @@ public class WorldJS {
                 )
                 .<VerticalAnchor>registerSingleArg(
                         "constantHeightRange",
-                        VERTICAL_ANCHOR,
+                        Wrappers.VERTICAL_ANCHOR,
                         "height",
                         a -> HeightRangePlacement.of(ConstantHeight.of(a))
                 )

@@ -7,6 +7,7 @@ import dev.latvian.mods.rhino.EvaluatorException;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
@@ -19,18 +20,16 @@ import java.util.function.Consumer;
 
 public class PlacedFeatureModifierEvent extends Event {
 
-    public static Map<String, ModifierNamespace> getNamespaces(Consumer<PlacementModifier> ret) {
+    public static Map<String, ModifierNamespace> createNamespaces() {
         final Map<String, ModifierNamespace> m = new HashMap<>();
-        NeoForge.EVENT_BUS.post(new PlacedFeatureModifierEvent(m, ret));
+        NeoForge.EVENT_BUS.post(new PlacedFeatureModifierEvent(m));
         return m;
     }
 
     private final Map<String, ModifierNamespace> builder;
-    private final Consumer<PlacementModifier> modRet;
 
-    public PlacedFeatureModifierEvent(Map<String, ModifierNamespace> builder, Consumer<PlacementModifier> modRet) {
+    public PlacedFeatureModifierEvent(Map<String, ModifierNamespace> builder) {
         this.builder = builder;
-        this.modRet = modRet;
     }
 
     public ModifierNamespace namespace(String namespace) {
@@ -119,7 +118,7 @@ public class PlacedFeatureModifierEvent extends Event {
                     if (args.length == 0) {
                         final PlacementModifier mod = func.call(args);
                         functionCalled = true;
-                        modRet.accept(mod);
+                        PlacedFeatureBuilder.Modifiers.accept(mod);
                         break;
                     } else {
                         try {
@@ -127,7 +126,7 @@ public class PlacedFeatureModifierEvent extends Event {
                             func.cast(casted, args, cx);
                             final PlacementModifier mod = func.call(casted);
                             functionCalled = true;
-                            modRet.accept(mod);
+                            PlacedFeatureBuilder.Modifiers.accept(mod);
                             break;
                         } catch (Throwable t) {
                             throw Context.throwAsScriptRuntimeEx(t, cx);
