@@ -25,7 +25,9 @@ public class BlockPileConfigurationBuilder extends ConfiguredFeatureBuilder<Bloc
 
     @Override
     protected BlockPileConfiguration createFeatureConfiguration() {
-        return new BlockPileConfiguration(notNull(provider, "State provider must not be null!"));
+        return new BlockPileConfiguration(
+                notNull(provider, "stateProvider")
+        );
     }
 
     @Override

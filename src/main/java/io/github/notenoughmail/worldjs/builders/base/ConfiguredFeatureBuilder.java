@@ -10,6 +10,7 @@ import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -31,34 +32,52 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
         return i -> factory.apply(i, feature);
     }
 
-    protected static int assertPositive(int val, String msg) {
-        if (val < 1) throw new IllegalArgumentException(msg);
+    protected static int assertPositive(int val, String name) {
+        if (val < 1) throw new IllegalArgumentException("'" + name + "' must be > 0");
         return val;
     }
 
-    protected static int assertNonNegative(int val, String msg) {
-        if (val < 0) throw new IllegalArgumentException(msg);
+    protected static int assertNonNegative(int val, String name) {
+        if (val < 0) throw new IllegalArgumentException("'" + name + "' must be >= 0");
         return val;
     }
 
-    protected static int assertRange(int val, int min, int max, String msg) {
-        if (val < min || val > max) throw new IllegalArgumentException(msg);
+    protected static int assertRange(int val, int min, int max, String name) {
+        if (val < min || val > max) throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
         return val;
     }
 
-    protected static float assertUnit(float val, String msg) {
-        if (val < 0f || val > 1f) throw new IllegalArgumentException(msg);
+    protected static float assertRange(float val, float min, float max, String name) {
+        if (val < min || val > max) throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
         return val;
     }
 
-    protected static IntProvider assertRange(IntProvider provider, int min, int max, String msg) {
-        if (provider.getMinValue() < min || provider.getMaxValue() > max) throw new IllegalArgumentException(msg);
+    protected static double assertRange(double val, double min, double max, String name) {
+        if (val < min || val > max) throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+        return val;
+    }
+
+    protected static float assertUnit(float val, String name) {
+        return assertRange(val, 0f, 1f, name);
+    }
+
+    protected static double assertUnit(double val, String name) {
+        return assertRange(val, 0D, 1D, name);
+    }
+
+    protected static IntProvider assertRange(IntProvider provider, int min, int max, String name) {
+        if (provider.getMinValue() < min || provider.getMaxValue() > max) throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
         return provider;
     }
 
-    protected <T> T notNull(T t, String msg) {
+    protected static FloatProvider assertRange(FloatProvider provider, float min, float max, String name) {
+        if (provider.getMinValue() < min || provider.getMaxValue() > max) throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+        return provider;
+    }
+
+    protected <T> T notNull(T t, String name) {
         if (t == null) {
-            throw new KubeRuntimeException(msg)
+            throw new KubeRuntimeException("'" + name + "' must be defined!")
                     .source(sourceLine);
         }
         return t;

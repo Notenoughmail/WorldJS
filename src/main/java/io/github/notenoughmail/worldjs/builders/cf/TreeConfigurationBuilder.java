@@ -92,12 +92,12 @@ public class TreeConfigurationBuilder extends ConfiguredFeatureBuilder<TreeConfi
     @Override
     protected TreeConfiguration createFeatureConfiguration() {
         return Util.make(new TreeConfiguration.TreeConfigurationBuilder(
-                notNull(trunkProvider, "Trunk provider must not be null!"),
-                notNull(trunkPlacer, "Trunk placer must not be null!"),
-                notNull(foliageProvider, "Foliage provider must not be null!"),
-                notNull(foliagePlacer, "Foliage placer must not be null!"),
+                notNull(trunkProvider, "trunkProvider"),
+                notNull(trunkPlacer, "trunkPlacer"),
+                notNull(foliageProvider, "foliageProvider"),
+                notNull(foliagePlacer, "foliagePlacer"),
                 Optional.ofNullable(rootPlacer),
-                notNull(minimumSize, "Minimum size must not be null!")
+                notNull(minimumSize, "minimumSize")
         ), b -> {
             if (ignoreVines) b.ignoreVines();
             if (forceDirt) b.forceDirt();

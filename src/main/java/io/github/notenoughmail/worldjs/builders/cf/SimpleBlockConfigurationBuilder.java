@@ -23,7 +23,9 @@ public class SimpleBlockConfigurationBuilder extends ConfiguredFeatureBuilder<Si
 
     @Override
     protected SimpleBlockConfiguration createFeatureConfiguration() {
-        return new SimpleBlockConfiguration(notNull(toPlace, "To place must be defined"));
+        return new SimpleBlockConfiguration(
+                notNull(toPlace, "toPlace")
+        );
     }
 
     @Override

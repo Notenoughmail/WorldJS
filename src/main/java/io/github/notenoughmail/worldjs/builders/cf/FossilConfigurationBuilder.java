@@ -54,8 +54,8 @@ public class FossilConfigurationBuilder extends ConfiguredFeatureBuilder<FossilF
         return new FossilFeatureConfiguration(
                 fossilStructures,
                 overlayStructures,
-                notNull(fossilProcessors, "Fossil processors must not be null!"),
-                notNull(overlayProcessors, "Overlay processors mut not be null!"),
+                notNull(fossilProcessors, "fossilProcessors"),
+                notNull(overlayProcessors, "overlayProcessors"),
                 maxEmptyCornersAllowed
         );
     }

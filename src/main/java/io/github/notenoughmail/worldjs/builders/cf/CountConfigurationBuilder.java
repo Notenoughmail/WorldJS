@@ -17,13 +17,15 @@ public class CountConfigurationBuilder extends ConfiguredFeatureBuilder<CountCon
     }
 
     public CountConfigurationBuilder count(IntProvider count) {
-        this.count = assertRange(count, 0, 256, "Count must be in the range [0, 256]");
+        this.count = assertRange(count, 0, 256, "count");
         return this;
     }
 
     @Override
     protected CountConfiguration createFeatureConfiguration() {
-        return new CountConfiguration(notNull(count, "Count must be defined!"));
+        return new CountConfiguration(
+                notNull(count, "count")
+        );
     }
 
     @Override

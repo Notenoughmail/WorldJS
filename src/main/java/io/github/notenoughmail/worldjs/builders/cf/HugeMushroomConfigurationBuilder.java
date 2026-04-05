@@ -21,11 +21,26 @@ public class HugeMushroomConfigurationBuilder extends ConfiguredFeatureBuilder.W
         foliageRadius = 2;
     }
 
+    public HugeMushroomConfigurationBuilder capProvider(BlockStateProvider provider) {
+        cap = provider;
+        return this;
+    }
+
+    public HugeMushroomConfigurationBuilder stemProvider(BlockStateProvider provider) {
+        stem = provider;
+        return this;
+    }
+
+    public HugeMushroomConfigurationBuilder foliageRadius(int radius) {
+        foliageRadius = radius;
+        return this;
+    }
+
     @Override
     protected HugeMushroomFeatureConfiguration createFeatureConfiguration() {
         return new HugeMushroomFeatureConfiguration(
-                notNull(cap, "Cap provider must not be null!"),
-                notNull(stem, "Stem provider must not be null!"),
+                notNull(cap, "capProvider"),
+                notNull(stem, "stemProvider"),
                 foliageRadius
         );
     }

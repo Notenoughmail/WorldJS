@@ -59,22 +59,22 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
     }
 
     public VegetationPatchConfigurationBuilder depth(IntProvider depth) {
-        this.depth = assertRange(depth, 1, 128, "Depth must be in the range [1, 128]");
+        this.depth = assertRange(depth, 1, 128, "depth");
         return this;
     }
 
     public VegetationPatchConfigurationBuilder extraBottomBlockChance(float chance) {
-        extraBottomBlockChance = assertUnit(chance, "Extra bottom chance must be in the range [0, 1]");
+        extraBottomBlockChance = assertUnit(chance, "extraBottomBlockChance");
         return this;
     }
 
     public VegetationPatchConfigurationBuilder verticalRange(int range) {
-        verticalRange = assertRange(range, 1, 256, "Vertical range must be in the range [1, 256]");
+        verticalRange = assertRange(range, 1, 256, "verticalRange");
         return this;
     }
 
     public VegetationPatchConfigurationBuilder vegetationChance(float chance) {
-        vegetationChance = assertUnit(chance, "Vegetation chance must be in range [0, 1]");
+        vegetationChance = assertUnit(chance, "vegetationChance");
         return this;
     }
 
@@ -84,22 +84,22 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
     }
 
     public VegetationPatchConfigurationBuilder extraEdgeColumnChance(float chance) {
-        extraEdgeColumnChance = assertUnit(chance, "Extra edge column chance must be in range [0, 1]");
+        extraEdgeColumnChance = assertUnit(chance, "extraEdgeColumnChance");
         return this;
     }
 
     @Override
     protected VegetationPatchConfiguration createFeatureConfiguration() {
         return new VegetationPatchConfiguration(
-                notNull(replaceable, "Replaceable blocks must not be null!"),
-                notNull(groundState, "Ground state must not be null!"),
-                notNull(vegetationFeature, "Vegetation feature must not be null!"),
+                notNull(replaceable, "replaceableBlocks"),
+                notNull(groundState, "groundState"),
+                notNull(vegetationFeature, "vegetationFeature"),
                 surface,
-                notNull(depth, "Depth must not be null!"),
+                notNull(depth, "depth"),
                 extraBottomBlockChance,
                 verticalRange,
                 vegetationChance,
-                notNull(xzRadius, "X z radius must not be null!"),
+                notNull(xzRadius, "xzRadius"),
                 extraEdgeColumnChance
         );
     }

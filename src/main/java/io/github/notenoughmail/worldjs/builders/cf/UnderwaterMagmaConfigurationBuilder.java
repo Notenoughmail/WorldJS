@@ -17,17 +17,17 @@ public class UnderwaterMagmaConfigurationBuilder extends ConfiguredFeatureBuilde
     }
 
     public UnderwaterMagmaConfigurationBuilder floorSearchRange(int range) {
-        floorSearchRange = assertRange(range, 0, 512, "Floor search range must be in range [0, 512]");
+        floorSearchRange = assertRange(range, 0, 512, "floorSearchRange");
         return this;
     }
 
     public UnderwaterMagmaConfigurationBuilder placementRadiusAroundFloor(int radius) {
-        placementRadiusAroundFloor = assertRange(radius, 0, 64, "Placement radius around floor must be in range [0, 64]");
+        placementRadiusAroundFloor = assertRange(radius, 0, 64, "placementRadiusAroundFloor");
         return this;
     }
 
     public UnderwaterMagmaConfigurationBuilder placementProbabilityPerValidPosition(float probability) {
-        placementProbabilityPerValidPosition = assertUnit(probability, "Placement probability per valid position must be in range [0, 1]");
+        placementProbabilityPerValidPosition = assertUnit(probability, "placementProbabilityPerValidPosition");
         return this;
     }
 

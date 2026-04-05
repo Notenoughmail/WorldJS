@@ -19,7 +19,7 @@ public class ProbabilityFeatureConfigurationBuilder extends ConfiguredFeatureBui
     }
 
     public ProbabilityFeatureConfigurationBuilder probability(float probability) {
-        this.probability = assertUnit(probability, "Probability must be in the range [0, 1]");
+        this.probability = assertUnit(probability, "probability");
         return this;
     }
 

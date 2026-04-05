@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.Context;
@@ -12,11 +14,11 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class PlacedFeatureModifierEvent extends Event {
 
@@ -26,6 +28,8 @@ public class PlacedFeatureModifierEvent extends Event {
         return m;
     }
 
+    private static final Param[] EMPTY_PARAMS = new Param[0];
+
     private final Map<String, ModifierNamespace> builder;
 
     public PlacedFeatureModifierEvent(Map<String, ModifierNamespace> builder) {
@@ -34,6 +38,50 @@ public class PlacedFeatureModifierEvent extends Event {
 
     public ModifierNamespace namespace(String namespace) {
         return builder.computeIfAbsent(namespace, ModifierNamespace::new);
+    }
+
+    public Info info(String value) {
+        return info(value, EMPTY_PARAMS);
+    }
+
+    public Info info(String value, Param... params) {
+        return new Info() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Info.class;
+            }
+
+            @Override
+            public String value() {
+                return value;
+            }
+
+            @Override
+            public Param[] params() {
+                return params;
+            }
+        };
+    }
+
+    public Param param(String name, String value) {
+        return new Param() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Param.class;
+            }
+
+            @Override
+            public String name() {
+                return name;
+            }
+
+            @Override
+            public String value() {
+                return value;
+            }
+        };
     }
 
     public class ModifierNamespace extends BaseFunction {
@@ -50,8 +98,8 @@ public class PlacedFeatureModifierEvent extends Event {
         private static final String[] EMPTY = {};
 
         @HideFromJS
-        public ModifierNamespace unit(String name, PlacementModifier modifier) {
-            return register(name, TypeInfo.EMPTY_ARRAY, EMPTY, o -> modifier);
+        public ModifierNamespace unit(String name, PlacementModifier modifier, Info info) {
+            return register(name, TypeInfo.EMPTY_ARRAY, EMPTY, o -> modifier, info);
         }
 
         @HideFromJS
@@ -59,21 +107,24 @@ public class PlacedFeatureModifierEvent extends Event {
                 String name,
                 TypeInfo[] args,
                 String[] argNames,
-                Method<Object[]> method
+                Method<Object[]> method,
+                Info info
         ) {
             if (argNames.length != args.length) throw new IllegalArgumentException("Must have same number of args as arg names!");
             final ModifierFunctions functions = this.functions.computeIfAbsent(name, n -> new ModifierFunctions(n, this));
-            functions.functions.add(new ModifierFunction(args, argNames, method));
+            functions.functions.add(new ModifierFunction(args, argNames, method, info));
             return this;
         }
 
+        @HideFromJS
         public <T> ModifierNamespace registerSingleArg(
                 String name,
                 TypeInfo arg,
                 String argName,
-                Method<T> method
+                Method<T> method,
+                Info info
         ) {
-            return register(name, new TypeInfo[] { arg }, new String[] { argName }, o -> method.invoke(Cast.to(o[0])));
+            return register(name, new TypeInfo[] { arg }, new String[] { argName }, o -> method.invoke(Cast.to(o[0])), info);
         }
 
         @HideFromJS
@@ -81,9 +132,10 @@ public class PlacedFeatureModifierEvent extends Event {
                 String name,
                 Class<T> arg,
                 String argName,
-                Method<T> method
+                Method<T> method,
+                Info info
         ) {
-            return registerSingleArg(name, TypeInfo.of(arg), argName, method);
+            return registerSingleArg(name, TypeInfo.of(arg), argName, method, info);
         }
 
         @Override
@@ -139,7 +191,7 @@ public class PlacedFeatureModifierEvent extends Event {
         }
     }
 
-    public record ModifierFunction(TypeInfo[] args, String[] argNames, Method<Object[]> method) {
+    public record ModifierFunction(TypeInfo[] args, String[] argNames, Method<Object[]> method, Info info) {
 
         void cast(Object[] ret, Object[] passed, Context ctx) throws EvaluatorException {
             for (int i = 0 ; i < ret.length ; i++) {

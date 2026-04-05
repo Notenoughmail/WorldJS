@@ -40,21 +40,21 @@ public class DiskConfigurationBuilder extends ConfiguredFeatureBuilder<DiskConfi
     }
 
     public DiskConfigurationBuilder radius(IntProvider radius) {
-        this.radius = assertRange(radius, 0, 8, "Radius must be in the range [0, 8]");
+        this.radius = assertRange(radius, 0, 8, "radius");
         return this;
     }
 
     public DiskConfigurationBuilder halfHeight(int height) {
-        halfHeight = assertRange(height, 0, 4, "Half height must be in the range [0, 4]");
+        halfHeight = assertRange(height, 0, 4, "halfHeight");
         return this;
     }
 
     @Override
     protected DiskConfiguration createFeatureConfiguration() {
         return new DiskConfiguration(
-                notNull(stateProvider, "State provider must be defined!"),
-                notNull(target, "Target must be defined!"),
-                notNull(radius, "Radius must be defined!"),
+                notNull(stateProvider, "stateProvider"),
+                notNull(target, "target"),
+                notNull(radius, "radius"),
                 halfHeight
         );
     }

@@ -29,8 +29,8 @@ public class LakeConfigurationBuilder extends ConfiguredFeatureBuilder<LakeFeatu
     @Override
     protected LakeFeature.Configuration createFeatureConfiguration() {
         return new LakeFeature.Configuration(
-                notNull(fluid, "Fluid must be defined!"),
-                notNull(barrier, "Barrier must be defined!")
+                notNull(fluid, "fluid"),
+                notNull(barrier, "barrier")
         );
     }
 

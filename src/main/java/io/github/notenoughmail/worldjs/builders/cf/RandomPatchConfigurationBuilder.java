@@ -29,12 +29,12 @@ public class RandomPatchConfigurationBuilder extends ConfiguredFeatureBuilder.Wi
     }
 
     public RandomPatchConfigurationBuilder xzSpread(int spread) {
-        xzSpread = assertNonNegative(spread, "X-z spread must be non negative");
+        xzSpread = assertNonNegative(spread, "xzSpread");
         return this;
     }
 
     public RandomPatchConfigurationBuilder ySpread(int spread) {
-        ySpread = assertNonNegative(spread, "Y spread must be non negative");
+        ySpread = assertNonNegative(spread, "ySpread");
         return this;
     }
 
@@ -53,7 +53,7 @@ public class RandomPatchConfigurationBuilder extends ConfiguredFeatureBuilder.Wi
                 tries,
                 xzSpread,
                 ySpread,
-                notNull(feature, "Feature must be defined!")
+                notNull(feature, "feature")
         );
     }
 }

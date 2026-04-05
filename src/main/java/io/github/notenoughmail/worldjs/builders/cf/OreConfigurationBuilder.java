@@ -8,16 +8,17 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @ReturnsSelf
-public class OreConfigurationBuilder extends ConfiguredFeatureBuilder<OreConfiguration> {
+public class OreConfigurationBuilder extends ConfiguredFeatureBuilder.WithFeature<OreConfiguration> {
 
     public transient List<OreConfiguration.TargetBlockState> targets;
     public transient int size;
     public transient float discardChanceOnAirExposure;
 
-    public OreConfigurationBuilder(ResourceLocation id) {
-        super(id);
+    public OreConfigurationBuilder(ResourceLocation id, Supplier<Feature<OreConfiguration>> feature) {
+        super(id, feature);
         targets = new ArrayList<>();
     }
 
@@ -27,12 +28,12 @@ public class OreConfigurationBuilder extends ConfiguredFeatureBuilder<OreConfigu
     }
 
     public OreConfigurationBuilder size(int size) {
-        this.size = assertRange(size, 0, 64, "Size must be in range [0, 64]");
+        this.size = assertRange(size, 0, 64, "size");
         return this;
     }
 
     public OreConfigurationBuilder discardChanceOnAirExposure(float chance) {
-        discardChanceOnAirExposure = assertUnit(chance, "Discard chance on air exposure must be in the range [0, 1]");
+        discardChanceOnAirExposure = assertUnit(chance, "discardChanceOnAirExposure");
         return this;
     }
 
@@ -43,10 +44,5 @@ public class OreConfigurationBuilder extends ConfiguredFeatureBuilder<OreConfigu
                 size,
                 discardChanceOnAirExposure
         );
-    }
-
-    @Override
-    protected Feature<OreConfiguration> getFeature() {
-        return Feature.ORE;
     }
 }

@@ -52,11 +52,11 @@ public class HugeFungusConfigurationBuilder extends ConfiguredFeatureBuilder<Hug
     @Override
     protected HugeFungusConfiguration createFeatureConfiguration() {
         return new HugeFungusConfiguration(
-                notNull(validBaseState, "Valid base block must be defined!"),
-                notNull(stemState, "Stem state must be defined!"),
-                notNull(hatState, "Hat state must be defined!"),
-                notNull(decorState, "Decor state must be defined!"),
-                notNull(replaceableBlocks, "Replaceable blocks must be defined!"),
+                notNull(validBaseState, "validBaseBlock"),
+                notNull(stemState, "stemState"),
+                notNull(hatState, "hatState"),
+                notNull(decorState, "decorState"),
+                notNull(replaceableBlocks, "replaceableBlocks"),
                 planted
         );
     }

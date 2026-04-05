@@ -31,7 +31,7 @@ public class BlockColumnConfigurationBuilder extends ConfiguredFeatureBuilder<Bl
 
     public BlockColumnConfigurationBuilder layer(IntProvider height, BlockStateProvider state) {
         layers.add(BlockColumnConfiguration.layer(
-                assertRange(height, 1, Integer.MAX_VALUE, "Layer height must be non-negative"),
+                assertRange(height, 1, Integer.MAX_VALUE, "height"),
                 state
         ));
         return this;

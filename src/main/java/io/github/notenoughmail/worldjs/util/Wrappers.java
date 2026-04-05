@@ -55,7 +55,7 @@ public interface Wrappers {
                         yield BlockStateProvider.simple(state);
                     }
                     if (m.containsKey("block")) {
-                        final BlockState state = Cast.to(ctx.jsToJava(m.get("simple"), BLOCK_STATE));
+                        final BlockState state = Cast.to(ctx.jsToJava(m.get("block"), BLOCK_STATE));
                         yield BlockStateProvider.simple(state);
                     }
                     if (m.containsKey("rotate")) {

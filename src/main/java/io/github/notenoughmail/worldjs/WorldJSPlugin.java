@@ -18,7 +18,6 @@ import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -85,7 +84,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
             cf(c, "forest_rock", BlockStateConfigurationBuilder.class, Feature.FOREST_ROCK, BlockStateConfigurationBuilder::new);
             cf(c, "disk", DiskConfigurationBuilder.class, DiskConfigurationBuilder::new);
             cf(c, "lake", LakeConfigurationBuilder.class, LakeConfigurationBuilder::new);
-            cf(c, "ore", OreConfigurationBuilder.class, OreConfigurationBuilder::new);
+            cf(c, "ore", OreConfigurationBuilder.class, Feature.ORE, OreConfigurationBuilder::new);
             cf(c, "end_spike", SpikeConfigurationBuilder.class, SpikeConfigurationBuilder::new);
             cf(c, "end_gateway", EndGatewayConfigurationBuilder.class, EndGatewayConfigurationBuilder::new);
             cf(c, "seagrass", ProbabilityFeatureConfigurationBuilder.class, Feature.SEAGRASS, ProbabilityFeatureConfigurationBuilder::new);
@@ -93,7 +92,21 @@ public class WorldJSPlugin implements KubeJSPlugin {
             cf(c, "simple_block", SimpleBlockConfigurationBuilder.class, SimpleBlockConfigurationBuilder::new);
             cf(c, "bamboo", ProbabilityFeatureConfigurationBuilder.class, Feature.BAMBOO, ProbabilityFeatureConfigurationBuilder::new);
             cf(c, "huge_fungus", HugeFungusConfigurationBuilder.class, HugeFungusConfigurationBuilder::new);
-            // TODO: 1.0.0 | All the rest...
+            cf(c, "nether_forest_vegetation", NetherForestVegetationConfigBuilder.class, NetherForestVegetationConfigBuilder::new);
+            cf(c, "twisting_vines", TwistingVinesConfigBuilder.class, TwistingVinesConfigBuilder::new);
+            cf(c, "basalt_columns", ColumnFeatureConfigurationBuilder.class, ColumnFeatureConfigurationBuilder::new);
+            cf(c, "delta_feature", DeltaFeatureConfigurationBuilder.class, DeltaFeatureConfigurationBuilder::new);
+            cf(c, "replace_blobs", ReplaceSphereConfigurationBuilder.class, ReplaceSphereConfigurationBuilder::new); // Registered as "netherrack_replace_blobs", but doesn't appear to be nether(rack) limited
+            cf(c, "fill_layer", LayerConfigurationBuilder.class, LayerConfigurationBuilder::new);
+            cf(c, "scattered_ore", OreConfigurationBuilder.class, Feature.SCATTERED_ORE, OreConfigurationBuilder::new);
+            cf(c, "random_selector", RandomFeatureConfigurationBuilder.class, RandomFeatureConfigurationBuilder::new);
+            cf(c, "simple_random_selector", SimpleRandomFeatureConfigurationBuilder.class, SimpleRandomFeatureConfigurationBuilder::new);
+            cf(c, "random_boolean_selector", RandomBooleanFeatureConfigurationBuilder.class, RandomBooleanFeatureConfigurationBuilder::new);
+            cf(c, "geode", GeodeConfigurationBuilder.class, GeodeConfigurationBuilder::new);
+            cf(c, "dripstone_cluster", DripstoneClusterConfigurationBuilder.class, DripstoneClusterConfigurationBuilder::new);
+            cf(c, "large_dripstone", LargeDripstoneConfigurationBuilder.class, LargeDripstoneConfigurationBuilder::new);
+            cf(c, "pointed_dripstone", PointedDripstoneConfigurationBuilder.class, PointedDripstoneConfigurationBuilder::new);
+            cf(c, "sculk_patch", SculkPatchConfigurationBuilder.class, SculkPatchConfigurationBuilder::new);
         });
         registry.of(NeoForgeRegistries.Keys.BIOME_MODIFIERS, c -> {
             bm(c, "add_features", AddFeaturesBiomeModifierBuilder.class, AddFeaturesBiomeModifierBuilder::new);
@@ -144,7 +157,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
 
     @Override
     public void registerRecordDefaults(RecordDefaultsRegistry registry) {
-        registry.register(new AddSpawnsBiomeModifierBuilder.Spawn(EntityType.ITEM, 1, 0, 1));
+        registry.register(new AddSpawnsBiomeModifierBuilder.Spawn(null, 1, 0, 1));
     }
 
     @Override

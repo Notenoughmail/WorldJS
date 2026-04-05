@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent.ModifierFunction;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent.ModifierFunctions;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent.ModifierNamespace;
@@ -9,6 +11,7 @@ import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSClassType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
@@ -63,6 +66,17 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
                             method.param(func.argNames()[i], typeConverter.convertType(func.args()[i]));
                         }
                     });
+                }
+                final Info info = func.info();
+                final MethodDecl methodDecl = builder.methods.getLast();
+                if (!info.value().isEmpty()) {
+                    methodDecl.addComment(info.value());
+                }
+                if (info.params().length != 0) {
+                    methodDecl.linebreak();
+                    for (Param param : info.params()) {
+                        methodDecl.addComment("@param %s - %s".formatted(param.name(), param.value()));
+                    }
                 }
             }
         }

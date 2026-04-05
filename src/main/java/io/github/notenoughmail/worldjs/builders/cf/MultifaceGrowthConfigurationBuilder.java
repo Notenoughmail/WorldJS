@@ -36,7 +36,7 @@ public class MultifaceGrowthConfigurationBuilder extends ConfiguredFeatureBuilde
     }
 
     public MultifaceGrowthConfigurationBuilder searchRange(int range) {
-        searchRange = assertRange(range, 1, 64, "Search range must be in range [1, 64]");
+        searchRange = assertRange(range, 1, 64, "searchRange");
         return this;
     }
 
@@ -56,7 +56,7 @@ public class MultifaceGrowthConfigurationBuilder extends ConfiguredFeatureBuilde
     }
 
     public MultifaceGrowthConfigurationBuilder chanceOfSpreading(float chance) {
-        chanceOfSpreading = assertUnit(chance, "Chance of spreading must be in the range [0, 1]");
+        chanceOfSpreading = assertUnit(chance, "chanceOfSpreading");
         return this;
     }
 

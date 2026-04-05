@@ -35,12 +35,12 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
     }
 
     public RootSystemConfigurationBuilder requiredVerticalSpaceForTree(int space) {
-        requiredVerticalSpaceForTree = assertRange(space, 1, 64, "Required vertical space for tree must be in range [1, 64]");
+        requiredVerticalSpaceForTree = assertRange(space, 1, 64, "requiredVerticalSpaceForTree");
         return this;
     }
 
     public RootSystemConfigurationBuilder rootRadius(int radius) {
-        rootRadius = assertRange(radius, 1, 64, "Root radius must be in range [1, 64]");
+        rootRadius = assertRange(radius, 1, 64, "rootRadius");
         return this;
     }
 
@@ -55,37 +55,37 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
     }
 
     public RootSystemConfigurationBuilder rootPlacementAttempts(int attempts) {
-        rootPlacementAttempts = assertRange(attempts, 1, 256, "Root placement attempts must be in range [1, 256]");
+        rootPlacementAttempts = assertRange(attempts, 1, 256, "rootPlacementAttempts");
         return this;
     }
 
     public RootSystemConfigurationBuilder rootColumnMaxHeight(int height) {
-        rootColumnMaxHeight = assertRange(height, 1, 4096, "Root column max height must be in range [1, 4096]");
+        rootColumnMaxHeight = assertRange(height, 1, 4096, "rootColumnMaxHeight");
         return this;
     }
 
     public RootSystemConfigurationBuilder hangingRootRadius(int radius) {
-        hangingRootRadius = assertRange(radius, 1, 64, "Hanging root radius must be in range [1, 64]");
+        hangingRootRadius = assertRange(radius, 1, 64, "hangingRootRadius");
         return this;
     }
 
     public RootSystemConfigurationBuilder hangingRootsVerticalSpan(int span) {
-        hangingRootsVerticalSpan = assertRange(span, 0, 16, "Hanging roots vertical span must be in range [0, 16]");
+        hangingRootsVerticalSpan = assertRange(span, 0, 16, "hangingRootsVerticalSpan");
         return this;
     }
 
-    public RootSystemConfigurationBuilder hangingRootStateProvier(BlockStateProvider provider) {
+    public RootSystemConfigurationBuilder hangingRootStateProvider(BlockStateProvider provider) {
         hangingRootStateProvider = provider;
         return this;
     }
 
     public RootSystemConfigurationBuilder hangingRootPlacementAttempts(int attempts) {
-        hangingRootPlacementAttempts = assertRange(attempts, 1, 256, "Hanging root placement attempts must be in range [1, 256]");
+        hangingRootPlacementAttempts = assertRange(attempts, 1, 256, "hangingRootPlacementAttempts");
         return this;
     }
 
     public RootSystemConfigurationBuilder allowedVerticalWaterForTree(int allowed) {
-        allowedVerticalWaterForTree = assertRange(allowed, 1, 64, "Allowed vertical water for tree must be in range [1, 64]");
+        allowedVerticalWaterForTree = assertRange(allowed, 1, 64, "allowedVerticalWaterForTree");
         return this;
     }
 
@@ -97,16 +97,16 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
     @Override
     protected RootSystemConfiguration createFeatureConfiguration() {
         return new RootSystemConfiguration(
-                notNull(treeFeature, "Tree feature must be defined!"),
+                notNull(treeFeature, "treeFeature"),
                 requiredVerticalSpaceForTree,
                 rootRadius,
-                notNull(rootReplaceable, "Root replaceable must be defined!"),
-                notNull(rootStateProvider, "Root state provider must be defined!"),
+                notNull(rootReplaceable, "rootReplaceable"),
+                notNull(rootStateProvider, "rootStateProvider"),
                 rootPlacementAttempts,
                 rootColumnMaxHeight,
                 hangingRootRadius,
                 hangingRootsVerticalSpan,
-                notNull(hangingRootStateProvider, "Hanging root state provider must be defined!"),
+                notNull(hangingRootStateProvider, "hangingRootStateProvider"),
                 hangingRootPlacementAttempts,
                 allowedVerticalWaterForTree,
                 allowedTreePosition

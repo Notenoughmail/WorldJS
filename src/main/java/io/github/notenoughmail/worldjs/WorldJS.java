@@ -32,21 +32,30 @@ public class WorldJS {
     private static final TypeInfo DIRECTION = TypeInfo.of(Direction.class);
     private static final TypeInfo HEIGHTMAP = TypeInfo.of(Heightmap.Types.class);
 
+    // TODO: 1.0.0 | Finish infos
     private void addVanillaPlacementModifiers(PlacedFeatureModifierEvent event) {
         event.namespace("minecraft")
-                .unit("biome", BiomeFilter.biome())
-                .unit("inSquare", InSquarePlacement.spread())
+                .unit("biome", BiomeFilter.biome(), event.info("Add a 'minecraft:biome' placement filter"))
+                .unit("inSquare", InSquarePlacement.spread(), event.info("Add a 'minecraft:in_square' placement modifier"))
                 .<IntProvider>registerSingleArg(
                         "count",
                         Wrappers.INT_PROVIDER,
                         "count",
-                        CountPlacement::of
+                        CountPlacement::of,
+                        event.info(
+                                "Add a 'minecraft:count' placement modifier",
+                                event.param("count", "How many times the placed feature should be placed")
+                        )
                 )
                 .registerSingleArg(
                         "fixed",
                         BlockPos[].class,
                         "positions",
-                        FixedPlacement::of
+                        FixedPlacement::of,
+                        event.info(
+                                "Add a 'minecraft:fixed_placement' placement modifier",
+                                event.param("positions", "The positions to place the feature at")
+                        )
                 )
                 .registerSingleArg(
                         "rarityFilter",
@@ -55,19 +64,31 @@ public class WorldJS {
                         i -> {
                             if (i < 1) throw new IllegalArgumentException("'chance' must be positive");
                             return RarityFilter.onAverageOnceEvery(i);
-                        }
+                        },
+                        event.info(
+                                "Add a 'minecraft:rarity_filter' placement filter",
+                                event.param("chance", "The chance the feature will successfully place as `1/chance`")
+                        )
                 )
                 .registerSingleArg(
                         "carvingMask",
                         GenerationStep.Carving.class,
                         "carvingStep",
-                        CarvingMaskPlacement::forStep
+                        CarvingMaskPlacement::forStep,
+                        event.info(
+                                "Add a 'minecraft:carving_mask' placement modifier",
+                                event.param("carvingStep", "The carving step volume for which the feature can place")
+                        )
                 )
                 .registerSingleArg(
                         "heightmap",
                         HEIGHTMAP,
                         "heightmap",
-                        HeightmapPlacement::onHeightmap
+                        HeightmapPlacement::onHeightmap,
+                        event.info(
+                                "Add a 'minecraft:heightmap' placement modifier",
+                                event.param("heightmap", "The heightmap to place the feature at")
+                        )
                 )
                 .register(
                         "noiseBasedCount",
@@ -85,6 +106,12 @@ public class WorldJS {
                                 i(o[0]),
                                 d(o[1]),
                                 d(o[2])
+                        ),
+                        event.info(
+                                "Add a 'minecraft:noise_based_count' placement modifier",
+                                event.param("noiseToCountRatio", ),
+                                event.param("noiseFactor", ),
+                                event.param("noiseOffset", )
                         )
                 )
                 .register(
@@ -101,6 +128,11 @@ public class WorldJS {
                                 i(o[0]),
                                 d(o[1]),
                                 0.0
+                        ),
+                        event.info(
+                                "Add a 'minecraft:noise_based_count' placement modifier",
+                                event.param("noiseTpCountRatio", ),
+                                event.param("noiseFactor", )
                         )
                 )
                 .register(
@@ -119,6 +151,12 @@ public class WorldJS {
                                 d(o[0]),
                                 i(o[1]),
                                 i(o[2])
+                        ),
+                        event.info(
+                                "Add a 'minecraft:noise_threshold_count' placement modifier",
+                                event.param("noiseLevel", ),
+                                event.param("belowNoise", ),
+                                event.param("aboveNoise", )
                         )
                 )
                 .register(
@@ -136,7 +174,12 @@ public class WorldJS {
                             if (xz.getMinValue() < -16 || y.getMinValue() < -16 || xz.getMaxValue() > 16 || y.getMaxValue() > 16)
                                 throw new IllegalArgumentException("'xzSpread' and 'ySpread' must be in range [-16, 16]");
                             return RandomOffsetPlacement.of(xz, y);
-                        }
+                        },
+                        event.info(
+                                "Add a 'minecraft:random_offset' placement modifier",
+                                event.param("xzSpread", "The horizontal spread"),
+                                event.param("ySpread", "The vertical spread")
+                        )
                 )
                 .<IntProvider>registerSingleArg(
                         "verticalRandomOffset",
@@ -146,7 +189,11 @@ public class WorldJS {
                             if (i.getMinValue() < -16 || i.getMaxValue() > 16)
                                 throw new IllegalArgumentException("'ySpread' must be in the range [-16, 16]");
                             return RandomOffsetPlacement.vertical(i);
-                        }
+                        },
+                        event.info(
+                                "Add a purely vertical 'minecraft:random_offset' placement modifier",
+                                event.param("ySpread", "The vertical spread")
+                        )
                 )
                 .<IntProvider>registerSingleArg(
                         "horizontalRandomOffset",
@@ -156,7 +203,11 @@ public class WorldJS {
                             if (i.getMinValue() < -16 || i.getMaxValue() > 16)
                                 throw new IllegalArgumentException("'xzSpread' must be in the range [-16, 16]");
                             return RandomOffsetPlacement.horizontal(i);
-                        }
+                        },
+                        event.info(
+                                "Add a purely horizontal 'minecraft:random_offset' placement modifier",
+                                event.param("xzSpread", "The horizontal spread")
+                        )
                 )
                 .<IntProvider>registerSingleArg(
                         "countOnEveryLayer",
@@ -166,7 +217,11 @@ public class WorldJS {
                             if (i.getMinValue() < 0 || i.getMaxValue() > 256)
                                 throw new IllegalArgumentException("'count' must be in the range [0, 256]");
                             return CountOnEveryLayerPlacement.of(i);
-                        }
+                        },
+                        event.info(
+                                "Add a 'minecraft:count_on_every_layer' placement modifier",
+                                event.param("count", "The number of time to place per layer")
+                        )
                 )
                 .register(
                         "environmentScan",
@@ -191,7 +246,14 @@ public class WorldJS {
                                     Cast.to(o[2]),
                                     step
                             );
-                        }
+                        },
+                        event.info(
+                                "Add a 'minecraft:environment_scan' placement modifier",
+                                event.param("directionOfSearch", ),
+                                event.param("targetCondition", ),
+                                event.param("allowedSearchCondition", ),
+                                event.param("maxSteps", )
+                        )
                 )
                 .register(
                         "environmentScan",
@@ -213,7 +275,13 @@ public class WorldJS {
                                     Cast.to(o[1]),
                                     step
                             );
-                        }
+                        },
+                        event.info(
+                                "Add a 'minecraft:environment_scan' placement modifier",
+                                event.param("directionOfSearch", ),
+                                event.param("targetCondition", ),
+                                event.param("maxSteps", )
+                        )
                 )
                 .register(
                         "surfaceRelativeThreshold",
@@ -231,6 +299,12 @@ public class WorldJS {
                                 Cast.to(o[0]),
                                 i(o[1]),
                                 i(o[2])
+                        ),
+                        event.info(
+                                "Add a 'minecraft:surface_relative_threshold_filter' placement filter",
+                                event.param("heightmap", ),
+                                event.param("minInclusive", ),
+                                event.param("maxInclusive", )
                         )
                 )
                 .register(
@@ -247,6 +321,11 @@ public class WorldJS {
                                 Cast.to(o[0]),
                                 Integer.MIN_VALUE,
                                 i(o[1])
+                        ),
+                        event.info(
+                                "Add a 'minecraft:surface_relative_threshold_filter' placement filter with no minimum bound",
+                                event.param("heightmap", ),
+                                event.param("maxInclusive", )
                         )
                 )
                 .register(
@@ -263,6 +342,11 @@ public class WorldJS {
                                 Cast.to(o[0]),
                                 i(o[1]),
                                 Integer.MAX_VALUE
+                        ),
+                        event.info(
+                                "Add a 'minecraft:surface_relative_threshold_filter' placement filter with no maximum bound",
+                                event.param("heightmap", ),
+                                event.param("minInclusive", )
                         )
                 )
                 .<Heightmap.Types>registerSingleArg(
@@ -273,25 +357,41 @@ public class WorldJS {
                                 m,
                                 Integer.MIN_VALUE,
                                 Integer.MAX_VALUE
+                        ),
+                        event.info(
+                                "Add a 'minecraft:surface_relative_threshold_filter' placement filter with no bounds",
+                                event.param("heightmap", )
                         )
                 )
                 .registerSingleArg(
                         "surfaceWaterDepth",
                         int.class,
                         "maxWaterDepth",
-                        SurfaceWaterDepthFilter::forMaxDepth
+                        SurfaceWaterDepthFilter::forMaxDepth,
+                        event.info(
+                                "Add a 'minecraft:surface_water_depth_filter' placement filter",
+                                event.param("maxWaterDepth", "The maximum depth of water under which the feature can be placed")
+                        )
                 )
                 .registerSingleArg(
                         "blockPredicate",
                         BLOCK_PREDICATE,
                         "predicate",
-                        BlockPredicateFilter::forPredicate
+                        BlockPredicateFilter::forPredicate,
+                        event.info(
+                                "Add a 'minecraft:block_predicate_filter' placement filter",
+                                event.param("predicate", "The block validator for placement")
+                        )
                 )
                 .registerSingleArg(
                         "heightRange",
                         HeightProvider.class,
                         "height",
-                        HeightRangePlacement::of
+                        HeightRangePlacement::of,
+                        event.info(
+                                "Add a 'minecraft:height_range' placement modifier",
+                                event.param("height", "The height range over which the feature may place")
+                        )
                 )
                 .register(
                         "uniformHeightRange",
@@ -306,6 +406,11 @@ public class WorldJS {
                         o -> HeightRangePlacement.uniform(
                                 Cast.to(o[0]),
                                 Cast.to(o[1])
+                        ),
+                        event.info(
+                                "Add a 'minecraft:height_range' placement modifier which has a uniform chance of placing the feature anywhere over the bounds",
+                                event.param("minInclusive", "The lower placement bound"),
+                                event.param("maxInclusive", "The upper placement bound")
                         )
                 )
                 .register(
@@ -321,13 +426,22 @@ public class WorldJS {
                         o -> HeightRangePlacement.triangle(
                                 Cast.to(o[0]),
                                 Cast.to(o[1])
+                        ),
+                        event.info(
+                                "Add a 'minecraft:height_range' placement modifier which has the highest chance of placing the feature in the center of bounds",
+                                event.param("minInclusive", "The lower placement bound"),
+                                event.param("maxInclusive", "The upper placement bound")
                         )
                 )
                 .<VerticalAnchor>registerSingleArg(
                         "constantHeightRange",
                         Wrappers.VERTICAL_ANCHOR,
                         "height",
-                        a -> HeightRangePlacement.of(ConstantHeight.of(a))
+                        a -> HeightRangePlacement.of(ConstantHeight.of(a)),
+                        event.info(
+                                "Add a 'minecraft:height_range' placement modifier which places the feature at the exact height given",
+                                event.param("height", "The height to place the feature at")
+                        )
                 )
         ;
     }
