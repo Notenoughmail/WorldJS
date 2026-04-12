@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class TreeConfigurationBuilder extends ConfiguredFeatureBuilder<TreeConfiguration> {
 

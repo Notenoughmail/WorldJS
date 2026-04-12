@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.Holder;
@@ -23,6 +25,13 @@ public class RandomFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<
         features = new ArrayList<>();
     }
 
+    @Info(
+            value = "Adds a placed feature to randomly choose from",
+            params = {
+                    @Param(name = "feature", value = "The feature to place"),
+                    @Param(name = "chance", value = "The chance of the feature being chosen, in the range [0, 1]")
+            }
+    )
     public RandomFeatureConfigurationBuilder addFeature(Holder.Reference<PlacedFeature> feature, float chance) {
         features.add(new WeightedPlacedFeature(
                 feature,
@@ -31,6 +40,7 @@ public class RandomFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<
         return this;
     }
 
+    @Info("The feature to place if none are chosen")
     public RandomFeatureConfigurationBuilder defaultFeature(Holder.Reference<PlacedFeature> feature) {
         fallback = feature;
         return this;

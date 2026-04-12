@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -16,16 +17,19 @@ public class TwistingVinesConfigBuilder extends ConfiguredFeatureBuilder<Twistin
         width = height = maxHeight = 1;
     }
 
+    @Info("The max spread width, must be positive")
     public TwistingVinesConfigBuilder spreadWidth(int width) {
         this.width = assertPositive(width, "Spread width must be positive");
         return this;
     }
 
+    @Info("The max spread height, must be positive")
     public TwistingVinesConfigBuilder spreadHeight(int height) {
         this.height = assertPositive(height, "Spread height must be positive");
         return this;
     }
 
+    @Info("The max height, must be positive")
     public TwistingVinesConfigBuilder maxHeight(int height) {
         maxHeight = assertPositive(height, "Max height must be positive");
         return this;

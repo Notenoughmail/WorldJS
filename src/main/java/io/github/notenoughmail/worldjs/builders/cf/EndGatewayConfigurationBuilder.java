@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.BlockPos;
@@ -19,11 +20,13 @@ public class EndGatewayConfigurationBuilder extends ConfiguredFeatureBuilder<End
         super(id);
     }
 
+    @Info("If the gateway should teleport entities to the exact exit position")
     public EndGatewayConfigurationBuilder exact(boolean exact) {
         this.exact = exact;
         return this;
     }
 
+    @Info("The exit position of the gateway")
     public EndGatewayConfigurationBuilder exit(BlockPos pos) {
         exit = pos;
         return this;

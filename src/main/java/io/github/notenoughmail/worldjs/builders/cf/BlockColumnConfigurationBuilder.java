@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.Direction;
@@ -29,6 +31,13 @@ public class BlockColumnConfigurationBuilder extends ConfiguredFeatureBuilder<Bl
         prioritizeTip = false;
     }
 
+    @Info(
+            value = "Adds a column layer",
+            params = {
+                    @Param(name = "height", value = "The height of the layer, must be non-negative"),
+                    @Param(name = "state", value = "The state to place in the layer")
+            }
+    )
     public BlockColumnConfigurationBuilder layer(IntProvider height, BlockStateProvider state) {
         layers.add(BlockColumnConfiguration.layer(
                 assertRange(height, 1, Integer.MAX_VALUE, "height"),
@@ -37,16 +46,19 @@ public class BlockColumnConfigurationBuilder extends ConfiguredFeatureBuilder<Bl
         return this;
     }
 
+    @Info("The direction the column places in")
     public BlockColumnConfigurationBuilder direction(Direction dir) {
         direction = dir;
         return this;
     }
 
+    @Info("Validation for the column positions")
     public BlockColumnConfigurationBuilder allowedPlacement(BlockPredicate allowed) {
         allowedPlacement = allowed;
         return this;
     }
 
+    @Info("Makes the column remove layers form the start of column when space is restricted")
     public BlockColumnConfigurationBuilder prioritizeTip() {
         prioritizeTip = true;
         return this;

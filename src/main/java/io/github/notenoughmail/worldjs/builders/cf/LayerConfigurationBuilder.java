@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -20,11 +21,13 @@ public class LayerConfigurationBuilder extends ConfiguredFeatureBuilder<LayerCon
         state = Blocks.AIR.defaultBlockState();
     }
 
+    @Info("The layer to fill, in the range [0, 4064]")
     public LayerConfigurationBuilder height(int height) {
         this.height = assertRange(height, 0, DimensionType.Y_SIZE, "height");
         return this;
     }
 
+    @Info("The block to fill the layer with")
     public LayerConfigurationBuilder state(BlockState state) {
         this.state = state;
         return this;

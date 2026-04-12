@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.Holder;
@@ -17,11 +18,13 @@ public class RandomBooleanFeatureConfigurationBuilder extends ConfiguredFeatureB
         super(id);
     }
 
+    @Info("The placed feature to place on a random `true` result")
     public RandomBooleanFeatureConfigurationBuilder featureTrue(Holder.Reference<PlacedFeature> feature) {
         featureTrue = feature;
         return this;
     }
 
+    @Info("The placed feature to place on a random `false` result")
     public RandomBooleanFeatureConfigurationBuilder featureFalse(Holder.Reference<PlacedFeature> feature) {
         featureFalse = feature;
         return this;

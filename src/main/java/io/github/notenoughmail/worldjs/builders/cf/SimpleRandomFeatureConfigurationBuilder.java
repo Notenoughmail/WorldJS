@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.HolderSet;
@@ -17,6 +18,7 @@ public class SimpleRandomFeatureConfigurationBuilder extends ConfiguredFeatureBu
         super(id);
     }
 
+    @Info("The placed features to randomly select from to place")
     public SimpleRandomFeatureConfigurationBuilder features(HolderSet<PlacedFeature> features) {
         this.features = features;
         return this;

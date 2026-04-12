@@ -1,10 +1,13 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.PointedDripstoneConfiguration;
 
+// TODO: 1.0.0 | JSDoc
+@ReturnsSelf
 public class PointedDripstoneConfigurationBuilder extends ConfiguredFeatureBuilder<PointedDripstoneConfiguration> {
 
     public transient float chanceOfTallerDripstone,

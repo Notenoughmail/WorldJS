@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -27,56 +28,67 @@ public class DripstoneClusterConfigurationBuilder extends ConfiguredFeatureBuild
         maxStalHeightDiff = heightDeviation = maxDistFromCenterAffectingHeightBias = maxDistFromEdgeAffectingChanceOfDripstoneColumn = 1;
     }
 
+    @Info("How many blocks the feature searches floor-to-ceiling, in the range [0, 512]")
     public DripstoneClusterConfigurationBuilder floorToCeilingSearchRange(int range) {
         floorToCeilingSearchRange = assertRange(range, 1, 512, "floorToCeilingSearchRange");
         return this;
     }
 
+    @Info("The height of the cluster, in the range [1, 128]")
     public DripstoneClusterConfigurationBuilder height(IntProvider provider) {
         height = assertRange(provider, 1, 128, "height");
         return this;
     }
 
+    @Info("The radius of the cluster, in the range [1, 128]")
     public DripstoneClusterConfigurationBuilder radius(IntProvider provider) {
         radius = assertRange(provider, 1, 128, "radius");
         return this;
     }
 
+    @Info("The maximum difference between the height of stalagmites and stalactites, in the range [0, 64]")
     public DripstoneClusterConfigurationBuilder maxStalagmiteStalactiteHeightDiff(int diff) {
         maxStalHeightDiff = assertRange(diff, 0, 64, "maxStalagmiteStalactiteHeightDiff");
         return this;
     }
 
+    @Info("The maximum difference from the height of a dripstone")
     public DripstoneClusterConfigurationBuilder heightDeviation(int deviation) {
         heightDeviation = assertRange(deviation, 1, 64, "heightDeviation");
         return this;
     }
 
+    @Info("The dripstone block layer's thickness, in the range [0, 128]")
     public DripstoneClusterConfigurationBuilder dripstoneBlockLayerThickness(IntProvider provider) {
         dripstoneBlockLayerThickness = assertRange(provider, 0, 128, "dripstoneBlockLayerThickness");
         return this;
     }
 
+    @Info("The density of columns, in the range [0, 2]")
     public DripstoneClusterConfigurationBuilder density(FloatProvider provider) {
         density = assertRange(provider, 0F, 2F, "density");
         return this;
     }
 
+    @Info("The chance of also placing a pool, in the range [0, 1]")
     public DripstoneClusterConfigurationBuilder wetness(FloatProvider provider) {
         wetness = assertRange(provider, 0F, 2F, "wetness");
         return this;
     }
 
+    @Info("The chance there is a column at the maximum distance from the center, in the range [0, 1]")
     public DripstoneClusterConfigurationBuilder chanceOfDripstoneColumnAtMaxDistanceFromCenter(float chance) {
         chanceOfDripstoneColumnAtMaxDistanceFromCenter = assertUnit(chance, "chanceOfDripstoneColumnAtMaxDistanceFromCenter");
         return this;
     }
 
+    @Info("The maximum distance from edge that can affect the chance of a dripstone column placing, in the range [1, 64]")
     public DripstoneClusterConfigurationBuilder maxDistanceFromEdgeAffectingChanceOfDripstoneColumn(int dist) {
         maxDistFromEdgeAffectingChanceOfDripstoneColumn = assertRange(dist, 1, 64, "maxDistanceFromEdgeAffectingChanceOfDripstoneColumn");
         return this;
     }
 
+    @Info("The maximum distance from the center that can affect the height bias, in the range [1, 64]")
     public DripstoneClusterConfigurationBuilder maxDistanceFromCenterAffectingHeightBias(int dist) {
         maxDistFromCenterAffectingHeightBias = assertRange(dist, 1, 64, "maxDistanceFromCenterAffectingHeightBias");
         return this;

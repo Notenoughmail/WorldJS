@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 import java.util.List;
 import java.util.function.Consumer;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeConfiguration> {
 

@@ -32,7 +32,6 @@ public class WorldJS {
     private static final TypeInfo DIRECTION = TypeInfo.of(Direction.class);
     private static final TypeInfo HEIGHTMAP = TypeInfo.of(Heightmap.Types.class);
 
-    // TODO: 1.0.0 | Finish infos
     private void addVanillaPlacementModifiers(PlacedFeatureModifierEvent event) {
         event.namespace("minecraft")
                 .unit("biome", BiomeFilter.biome(), event.info("Add a 'minecraft:biome' placement filter"))
@@ -109,9 +108,9 @@ public class WorldJS {
                         ),
                         event.info(
                                 "Add a 'minecraft:noise_based_count' placement modifier",
-                                event.param("noiseToCountRatio", ),
-                                event.param("noiseFactor", ),
-                                event.param("noiseOffset", )
+                                event.param("noiseToCountRatio", "Ratio of noise value to count"),
+                                event.param("noiseFactor", "Horizontal scale factor of the noise. Higher values make wider, more spaced out peaks"),
+                                event.param("noiseOffset", "Vertical offset of the noise")
                         )
                 )
                 .register(
@@ -131,8 +130,8 @@ public class WorldJS {
                         ),
                         event.info(
                                 "Add a 'minecraft:noise_based_count' placement modifier",
-                                event.param("noiseTpCountRatio", ),
-                                event.param("noiseFactor", )
+                                event.param("noiseTpCountRatio", "Vertical offset of the noise"),
+                                event.param("noiseFactor", "Horizontal scale factor of the noise. Higher values make wider, more spaced out peaks")
                         )
                 )
                 .register(
@@ -154,9 +153,9 @@ public class WorldJS {
                         ),
                         event.info(
                                 "Add a 'minecraft:noise_threshold_count' placement modifier",
-                                event.param("noiseLevel", ),
-                                event.param("belowNoise", ),
-                                event.param("aboveNoise", )
+                                event.param("noiseLevel", "The threshold for determining if to use `belowNoise` or `aboveNoise`"),
+                                event.param("belowNoise", "The count used when below the threshold"),
+                                event.param("aboveNoise", "The count used when above the threshold")
                         )
                 )
                 .register(
@@ -249,10 +248,10 @@ public class WorldJS {
                         },
                         event.info(
                                 "Add a 'minecraft:environment_scan' placement modifier",
-                                event.param("directionOfSearch", ),
-                                event.param("targetCondition", ),
-                                event.param("allowedSearchCondition", ),
-                                event.param("maxSteps", )
+                                event.param("directionOfSearch", "The direction to search in"),
+                                event.param("targetCondition", "The condition for a valid block"),
+                                event.param("allowedSearchCondition", "The condition that all steps in the scan must pass"),
+                                event.param("maxSteps", "The maximum number of blocks, in the range [1, 32], out from the original position to check")
                         )
                 )
                 .register(
@@ -278,9 +277,9 @@ public class WorldJS {
                         },
                         event.info(
                                 "Add a 'minecraft:environment_scan' placement modifier",
-                                event.param("directionOfSearch", ),
-                                event.param("targetCondition", ),
-                                event.param("maxSteps", )
+                                event.param("directionOfSearch", "The direction to search in"),
+                                event.param("targetCondition", "The condition for a valid block"),
+                                event.param("maxSteps", "The maximum number of block, in the range [1, 32], out from the original position to check")
                         )
                 )
                 .register(
@@ -302,9 +301,9 @@ public class WorldJS {
                         ),
                         event.info(
                                 "Add a 'minecraft:surface_relative_threshold_filter' placement filter",
-                                event.param("heightmap", ),
-                                event.param("minInclusive", ),
-                                event.param("maxInclusive", )
+                                event.param("heightmap", "The heightmap to be within range of"),
+                                event.param("minInclusive", "The minimum relative height from the surface to position"),
+                                event.param("maxInclusive", "The maximum relative height from the surface to position")
                         )
                 )
                 .register(
@@ -324,8 +323,8 @@ public class WorldJS {
                         ),
                         event.info(
                                 "Add a 'minecraft:surface_relative_threshold_filter' placement filter with no minimum bound",
-                                event.param("heightmap", ),
-                                event.param("maxInclusive", )
+                                event.param("heightmap", "The heightmap to be within range of"),
+                                event.param("maxInclusive", "The maximum relative height from the surface to position")
                         )
                 )
                 .register(
@@ -345,22 +344,8 @@ public class WorldJS {
                         ),
                         event.info(
                                 "Add a 'minecraft:surface_relative_threshold_filter' placement filter with no maximum bound",
-                                event.param("heightmap", ),
-                                event.param("minInclusive", )
-                        )
-                )
-                .<Heightmap.Types>registerSingleArg(
-                        "surfaceRelativeThreshold",
-                        HEIGHTMAP,
-                        "heightmap",
-                        m -> SurfaceRelativeThresholdFilter.of(
-                                m,
-                                Integer.MIN_VALUE,
-                                Integer.MAX_VALUE
-                        ),
-                        event.info(
-                                "Add a 'minecraft:surface_relative_threshold_filter' placement filter with no bounds",
-                                event.param("heightmap", )
+                                event.param("heightmap", "The heightmap to be within range of"),
+                                event.param("minInclusive", "The minimum relative height from the surface to position")
                         )
                 )
                 .registerSingleArg(

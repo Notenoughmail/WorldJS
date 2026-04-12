@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bm;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import net.minecraft.core.HolderSet;
@@ -20,11 +21,13 @@ public class AddCarversBiomeModifierBuilder extends BiomeModifierBuilder<BiomeMo
         step = GenerationStep.Carving.AIR;
     }
 
+    @Info("The carvers to add to the biome(s)")
     public AddCarversBiomeModifierBuilder carvers(HolderSet<ConfiguredWorldCarver<?>> carvers) {
         this.carvers = carvers;
         return this;
     }
 
+    @Info("The carving step to add the carver(s) to")
     public AddCarversBiomeModifierBuilder step(GenerationStep.Carving step) {
         this.step = step;
         return this;

@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.Holder;
@@ -24,33 +26,41 @@ public class FossilConfigurationBuilder extends ConfiguredFeatureBuilder<FossilF
         maxEmptyCornersAllowed = 0;
     }
 
+    @Info("The ids of fossil structure templates to choose for placing. Must be the same amount as overlay structures")
     public FossilConfigurationBuilder fossilStructures(List<ResourceLocation> structures) {
         fossilStructures = structures;
         return this;
     }
 
+    @Info("The ids of overlay structure templates to choose for placing. Must be the same amount as fossil structures")
     public FossilConfigurationBuilder overlayStructures(List<ResourceLocation> structures) {
         overlayStructures = structures;
         return this;
     }
 
+    @Info("The fossil structure template processor to use")
     public FossilConfigurationBuilder fossilProcessors(Holder.Reference<StructureProcessorList> processors) {
         fossilProcessors = processors;
         return this;
     }
 
+    @Info("The overlay structure template processor to use")
     public FossilConfigurationBuilder overlayProcessors(Holder.Reference<StructureProcessorList> processors) {
         overlayProcessors = processors;
         return this;
     }
 
+    @Info("How many corners may be empty while allowing the feature to generate, in the range [0, 7]")
     public FossilConfigurationBuilder maxEmptyCorners(int corners) {
-        maxEmptyCornersAllowed = corners;
+        maxEmptyCornersAllowed = assertRange(corners, 0, 7, "maxEmptyCorners");
         return this;
     }
 
     @Override
     protected FossilFeatureConfiguration createFeatureConfiguration() {
+        if (fossilStructures.size() != overlayStructures.size())
+            throw new KubeRuntimeException("Must have same number of fossil and overlay structures!")
+                    .source(sourceLine);
         return new FossilFeatureConfiguration(
                 fossilStructures,
                 overlayStructures,

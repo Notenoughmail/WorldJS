@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -22,16 +23,19 @@ public class OreConfigurationBuilder extends ConfiguredFeatureBuilder.WithFeatur
         targets = new ArrayList<>();
     }
 
+    @Info("The targets for ore placement")
     public OreConfigurationBuilder target(OreConfiguration.TargetBlockState target) {
         targets.add(target);
         return this;
     }
 
+    @Info("The size of the ore vein, in the range [0, 64]")
     public OreConfigurationBuilder size(int size) {
         this.size = assertRange(size, 0, 64, "size");
         return this;
     }
 
+    @Info("The chance the ore vein is discarded if any of its blocks neighbor air, in the range [0, 1]")
     public OreConfigurationBuilder discardChanceOnAirExposure(float chance) {
         discardChanceOnAirExposure = assertUnit(chance, "discardChanceOnAirExposure");
         return this;

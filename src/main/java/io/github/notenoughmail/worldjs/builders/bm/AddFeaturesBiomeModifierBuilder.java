@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bm;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import net.minecraft.core.HolderSet;
@@ -20,11 +21,13 @@ public class AddFeaturesBiomeModifierBuilder extends BiomeModifierBuilder<BiomeM
         step = GenerationStep.Decoration.UNDERGROUND_DECORATION;
     }
 
+    @Info("The decoration step to add the feature(s) to")
     public AddFeaturesBiomeModifierBuilder step(GenerationStep.Decoration step) {
         this.step = step;
         return this;
     }
 
+    @Info("The feature(s) to add to the biome(s)")
     public AddFeaturesBiomeModifierBuilder features(HolderSet<PlacedFeature> features) {
         this.features = features;
         return this;

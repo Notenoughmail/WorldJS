@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -24,26 +26,37 @@ public class DiskConfigurationBuilder extends ConfiguredFeatureBuilder<DiskConfi
         super(id);
     }
 
+    @Info("The block to place")
     public DiskConfigurationBuilder stateProvider(BlockStateProvider provider) {
         stateProvider = RuleBasedBlockStateProvider.simple(provider);
         return this;
     }
 
+    @Info(
+            value = "The block to place, depending on rules and with a fallback value",
+            params = {
+                    @Param(name = "fallback", value = "The bloc kto place if no rules pass"),
+                    @Param(name = "rules", value = "The rules for what bloc kto place")
+            }
+    )
     public DiskConfigurationBuilder stateProvider(BlockStateProvider fallback, List<RuleBasedBlockStateProvider.Rule> rules) {
         stateProvider = new RuleBasedBlockStateProvider(fallback, rules);
         return this;
     }
 
+    @Info("The validator for placement of the feature")
     public DiskConfigurationBuilder target(BlockPredicate target) {
         this.target = target;
         return this;
     }
 
+    @Info("The radius of the disk, in the range [0, 8]")
     public DiskConfigurationBuilder radius(IntProvider radius) {
         this.radius = assertRange(radius, 0, 8, "radius");
         return this;
     }
 
+    @Info("Half the height of the disk, in the range [0, 4]")
     public DiskConfigurationBuilder halfHeight(int height) {
         halfHeight = assertRange(height, 0, 4, "halfHeight");
         return this;

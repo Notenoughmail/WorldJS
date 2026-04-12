@@ -7,6 +7,7 @@ import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.ColumnFeatureConfiguration;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class ColumnFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<ColumnFeatureConfiguration> {
 

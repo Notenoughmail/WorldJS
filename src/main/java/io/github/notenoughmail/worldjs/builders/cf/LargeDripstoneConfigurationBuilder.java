@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -27,46 +28,55 @@ public class LargeDripstoneConfigurationBuilder extends ConfiguredFeatureBuilder
         maxColumnRadiusToCaveHeightRatio = 0.1F;
     }
 
+    @Info("The search range from start point to cave floor or ceiling, in the range [1, 512]")
     public LargeDripstoneConfigurationBuilder floorToCeilingSearchRange(int range) {
         floorToCeilingSearchRange = assertRange(range, 1, 512, "floorToCeilingSearchRange");
         return this;
     }
 
+    @Info("The min and max radius of the column, in the range [1, 60]")
     public LargeDripstoneConfigurationBuilder columnRadius(IntProvider provider) {
-        columnRadius = provider;
+        columnRadius = assertRange(provider, 1, 60, "columnRadius");
         return this;
     }
 
+    @Info("The height scale, a higher scale means a higher height. In the range [0, 20]")
     public LargeDripstoneConfigurationBuilder heightScale(FloatProvider provider) {
         heightScale = assertRange(provider, 0F, 20F, "heightScale");
         return this;
     }
 
+    @Info("The maximum ratio between the column radius and cave height, in the range [0, 1]")
     public LargeDripstoneConfigurationBuilder maxColumnRadiusToCaveHeightRatio(float ratio) {
-        maxColumnRadiusToCaveHeightRatio = assertRange(ratio, 0.1F, 1F, "maxCoumnRadiusToCaveHeightRatio");
+        maxColumnRadiusToCaveHeightRatio = assertRange(ratio, 0.1F, 1F, "maxColumnRadiusToCaveHeightRatio");
         return this;
     }
 
+    @Info("The bluntness/truncation of stalactites, higher values leads to shorter height. In the range [0, 10]")
     public LargeDripstoneConfigurationBuilder stalactiteBluntness(FloatProvider provider) {
         stalactiteBluntness = assertRange(provider, 0.1F, 10F, "stalactiteBluntness");
         return this;
     }
 
+    @Info("The bluntness/truncation of stalagmites, higher values leads to shorter height. In the range [0, 10]")
     public LargeDripstoneConfigurationBuilder stalagmiteBluntness(FloatProvider provider) {
         stalagmiteBluntness = assertRange(provider, 0.1F, 10F, "stalagmiteBluntness");
         return this;
     }
 
+    @Info("The inclination of the feature, in the range [0, 2]")
     public LargeDripstoneConfigurationBuilder windSpeed(FloatProvider provider) {
         windSpeed = assertRange(provider, 0F, 2F, "windSpeed");
         return this;
     }
 
+    @Info("The minimum column radius for wind to cause an inclination, in the range [0, 100]")
     public LargeDripstoneConfigurationBuilder minRadiusForWind(int radius) {
         minRadiusForWind = assertRange(radius, 0, 100, "minRadiusForWind");
         return this;
     }
 
+    @Info("The minimum bluntness values for wind to cause an inclination, in the range [0, 5]")
     public LargeDripstoneConfigurationBuilder minBluntnessForWind(float bluntness) {
         minBluntnessFroWind = assertRange(bluntness, 0F, 5F, "minBluntnessForWind");
         return this;

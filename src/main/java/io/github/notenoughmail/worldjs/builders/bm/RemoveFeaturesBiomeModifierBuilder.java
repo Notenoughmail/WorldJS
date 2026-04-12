@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bm;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import net.minecraft.core.HolderSet;
@@ -23,11 +24,13 @@ public class RemoveFeaturesBiomeModifierBuilder extends BiomeModifierBuilder<Bio
         steps = EnumSet.allOf(GenerationStep.Decoration.class);
     }
 
+    @Info("The feature(s) to add to the biome(s)")
     public RemoveFeaturesBiomeModifierBuilder features(HolderSet<PlacedFeature> features) {
         this.features = features;
         return this;
     }
 
+    @Info("The decoration step(s) to remove the feature(s) from")
     public RemoveFeaturesBiomeModifierBuilder steps(Set<GenerationStep.Decoration> steps) {
         this.steps = steps;
         return this;

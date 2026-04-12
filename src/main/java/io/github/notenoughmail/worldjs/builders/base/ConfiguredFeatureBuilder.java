@@ -5,6 +5,8 @@ import dev.latvian.mods.kubejs.registry.AdditionalObjectRegistry;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.registry.BuilderFactory;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
@@ -89,10 +91,15 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
         super(id);
     }
 
+    @Info("Create and modify the placed feature of the configured feature")
     public ConfiguredFeatureBuilder<FC> withPlacement(Context ctx, Consumer<PlacedFeatureBuilder> builder) {
         return withPlacement(ctx, KubeResourceLocation.wrap(id), builder);
     }
 
+    @Info(
+            value = "Create and modify the placed feature of the configured feature",
+            params = @Param(name = "id", value = "The id the placed feature will be create with")
+    )
     public ConfiguredFeatureBuilder<FC> withPlacement(Context ctx, KubeResourceLocation id, Consumer<PlacedFeatureBuilder> builder) {
         placedFeature = new PlacedFeatureBuilder(id.wrapped());
         placedFeature.sourceLine = SourceLine.of(ctx);

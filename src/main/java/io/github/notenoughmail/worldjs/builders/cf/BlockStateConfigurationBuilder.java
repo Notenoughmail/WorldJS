@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -20,6 +21,7 @@ public class BlockStateConfigurationBuilder extends ConfiguredFeatureBuilder.Wit
         state = Blocks.AIR.defaultBlockState();
     }
 
+    @Info("The state to place")
     public BlockStateConfigurationBuilder state(BlockState state) {
         this.state = state;
         return this;

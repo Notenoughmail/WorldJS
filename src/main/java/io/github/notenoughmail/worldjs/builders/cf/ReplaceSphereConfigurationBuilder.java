@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.ReplaceSphereConfiguration;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class ReplaceSphereConfigurationBuilder extends ConfiguredFeatureBuilder<ReplaceSphereConfiguration> {
 

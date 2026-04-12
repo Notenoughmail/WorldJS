@@ -2,6 +2,7 @@ package io.github.notenoughmail.worldjs.builders.base;
 
 import com.google.gson.JsonElement;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.util.Lazy;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.Context;
@@ -43,20 +44,24 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
         );
     }
 
+    @Info("The configured feature the placed feature will place")
     public PlacedFeatureBuilder configuredFeature(Holder.Reference<ConfiguredFeature<?, ?>> feature) {
         configuredFeature = feature;
         return this;
     }
 
+    @Info("Add an arbitrary placement modifier")
     public PlacedFeatureBuilder modifier(PlacementModifier modifier) {
         modifiers.add(modifier);
         return this;
     }
 
+    @Info("Add an arbitrary placement modifier from its json representation")
     public PlacedFeatureBuilder jsonModifier(JsonElement json) {
         return modifier(PlacementModifier.CODEC.decode(RegistryAccessContainer.current.json(), json).getOrThrow().getFirst());
     }
 
+    @Info("Add placement modifiers")
     public PlacedFeatureBuilder modifiers(Consumer<Modifiers> modifiers) {
         Modifiers.accept(this::modifier, modifiers);
         return this;

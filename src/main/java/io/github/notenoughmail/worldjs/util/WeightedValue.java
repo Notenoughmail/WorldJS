@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.util;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.*;
 import dev.latvian.mods.rhino.type.RecordTypeInfo;
@@ -41,6 +43,13 @@ import java.util.function.Consumer;
  * <p>
  * A single {@code WeightedValue} or a null instance within a list is meaningless and should not occur
  */
+@Info(
+        value = "A weighted value",
+        params = {
+                @Param(name = "weight", value = "The weight of the value"),
+                @Param(name = "value", value = "The value")
+        }
+)
 public record WeightedValue<T>(int weight, T value) {
 
     public static <T> SimpleWeightedRandomList<T> toVanilla(List<WeightedValue<T>> weightedValues) {

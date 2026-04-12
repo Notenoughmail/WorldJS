@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.function.Supplier;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilder.WithFeature<VegetationPatchConfiguration> {
 

@@ -12,6 +12,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.RootSystemConfi
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<RootSystemConfiguration> {
 

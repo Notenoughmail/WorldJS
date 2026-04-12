@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bm;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import net.minecraft.core.HolderSet;
@@ -23,11 +24,13 @@ public class RemoveCarversBiomeModifierBuilder extends BiomeModifierBuilder<Biom
         steps = EnumSet.allOf(GenerationStep.Carving.class);
     }
 
+    @Info("The carvers to remove from the biomes(s)")
     public RemoveCarversBiomeModifierBuilder carvers(HolderSet<ConfiguredWorldCarver<?>> carvers) {
         this.carvers = carvers;
         return this;
     }
 
+    @Info("The carving steps to remove the carver(s) from")
     public RemoveCarversBiomeModifierBuilder steps(Set<GenerationStep.Carving> steps) {
         this.steps = steps;
         return this;

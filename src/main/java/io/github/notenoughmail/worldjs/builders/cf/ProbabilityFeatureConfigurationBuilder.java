@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +19,7 @@ public class ProbabilityFeatureConfigurationBuilder extends ConfiguredFeatureBui
         probability = 1f;
     }
 
+    @Info("The probability of special properties being placed")
     public ProbabilityFeatureConfigurationBuilder probability(float probability) {
         this.probability = assertUnit(probability, "probability");
         return this;

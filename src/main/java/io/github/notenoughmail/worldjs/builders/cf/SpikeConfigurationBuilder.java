@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -23,16 +25,28 @@ public class SpikeConfigurationBuilder extends ConfiguredFeatureBuilder<SpikeCon
         spikes = new ArrayList<>();
     }
 
+    @Info("Makes the placed crystals invulnerable")
     public SpikeConfigurationBuilder invulnerableCrystals() {
         invulnerable = true;
         return this;
     }
 
-    public SpikeConfigurationBuilder target(BlockPos pos) {
+    @Info("The position the crystal beams target")
+    public SpikeConfigurationBuilder crystalBeamTarget(BlockPos pos) {
         target = pos;
         return this;
     }
 
+    @Info(
+            value = "Add a spike",
+            params = {
+                    @Param(name = "centerX", value = "The x coordinate"),
+                    @Param(name = "centerZ", value = "The z coordinate"),
+                    @Param(name = "radius", value = "The radius of the spike"),
+                    @Param(name = "height", value = "The height of the spike"),
+                    @Param(name = "guarded", value = "If the crystal on the spike should have an iron-bar cage")
+            }
+    )
     public SpikeConfigurationBuilder spike(int centerX, int centerZ, int radius, int height, boolean guarded) {
         spikes.add(new SpikeFeature.EndSpike(centerX, centerZ, radius, height, guarded));
         return this;

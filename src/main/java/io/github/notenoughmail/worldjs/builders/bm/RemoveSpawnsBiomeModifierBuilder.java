@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bm;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import net.minecraft.core.HolderSet;
@@ -17,6 +18,7 @@ public class RemoveSpawnsBiomeModifierBuilder extends BiomeModifierBuilder<Biome
         entityTypes = HolderSet.empty();
     }
 
+    @Info("The entity(s) to remove spawn for")
     public RemoveSpawnsBiomeModifierBuilder entityTypes(HolderSet<EntityType<?>> entityTypes) {
         this.entityTypes = entityTypes;
         return this;

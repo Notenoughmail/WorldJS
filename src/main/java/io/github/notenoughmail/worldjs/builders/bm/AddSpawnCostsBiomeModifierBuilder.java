@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bm;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import net.minecraft.core.HolderSet;
@@ -20,11 +21,13 @@ public class AddSpawnCostsBiomeModifierBuilder extends BiomeModifierBuilder<Biom
         cost = new MobSpawnSettings.MobSpawnCost(1, 0.5);
     }
 
+    @Info("The entity(s) to add a spawn cost for")
     public AddSpawnCostsBiomeModifierBuilder entityTypes(HolderSet<EntityType<?>> entityTypes) {
         this.entityTypes = entityTypes;
         return this;
     }
 
+    @Info("The spawn budget and cost for the entities")
     public AddSpawnCostsBiomeModifierBuilder cost(double spawnBudget, double costPerSpawn) {
         cost = new MobSpawnSettings.MobSpawnCost(spawnBudget, costPerSpawn);
         return this;

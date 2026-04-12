@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +19,7 @@ public class BlockPileConfigurationBuilder extends ConfiguredFeatureBuilder<Bloc
         provider = BlockStateProvider.simple(Blocks.AIR);
     }
 
+    @Info("The block to place")
     public BlockPileConfigurationBuilder stateProvider(BlockStateProvider provider) {
         this.provider = provider;
         return this;

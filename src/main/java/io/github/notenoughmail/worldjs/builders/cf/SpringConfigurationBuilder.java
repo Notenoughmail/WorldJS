@@ -11,6 +11,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.SpringConfiguration;
 import net.minecraft.world.level.material.FluidState;
 
+// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringConfiguration> {
 

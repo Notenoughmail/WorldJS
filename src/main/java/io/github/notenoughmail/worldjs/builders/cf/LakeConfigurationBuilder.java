@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -16,11 +17,13 @@ public class LakeConfigurationBuilder extends ConfiguredFeatureBuilder<LakeFeatu
         super(id);
     }
 
+    @Info("The block to use for the fluid of the lake")
     public LakeConfigurationBuilder fluid(BlockStateProvider provider) {
         fluid = provider;
         return this;
     }
 
+    @Info("The block to use for the abrrier of the lake")
     public LakeConfigurationBuilder barrier(BlockStateProvider provider) {
         barrier = provider;
         return this;

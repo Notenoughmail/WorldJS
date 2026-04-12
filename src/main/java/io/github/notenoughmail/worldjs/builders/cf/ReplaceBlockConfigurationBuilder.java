@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,7 @@ public class ReplaceBlockConfigurationBuilder extends ConfiguredFeatureBuilder<R
         targets = List.of();
     }
 
+    @Info("The replacement targets")
     public ReplaceBlockConfigurationBuilder targetStates(List<OreConfiguration.TargetBlockState> targets) {
         this.targets = targets;
         return this;
