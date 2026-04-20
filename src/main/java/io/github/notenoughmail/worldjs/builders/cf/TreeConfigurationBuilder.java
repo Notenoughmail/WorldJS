@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.Util;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class TreeConfigurationBuilder extends ConfiguredFeatureBuilder<TreeConfiguration> {
 
@@ -40,51 +40,61 @@ public class TreeConfigurationBuilder extends ConfiguredFeatureBuilder<TreeConfi
         decorators = List.of();
     }
 
+    @Info("The block to use as the trunk")
     public TreeConfigurationBuilder trunkProvider(BlockStateProvider provider) {
         trunkProvider = provider;
         return this;
     }
 
+    @Info("The trunk placer, defines how the trunk is generated")
     public TreeConfigurationBuilder trunkPlacer(TrunkPlacer placer) {
         trunkPlacer = placer;
         return this;
     }
 
+    @Info("The block to use for foliage")
     public TreeConfigurationBuilder foliageProvider(BlockStateProvider provider) {
         foliageProvider = provider;
         return this;
     }
 
+    @Info("The foliage placer, defines how the foliage is generated")
     public TreeConfigurationBuilder foliagePlacer(FoliagePlacer placer) {
         foliagePlacer = placer;
         return this;
     }
 
+    @Info("The root placer, defines the root blocks nad how they generate")
     public TreeConfigurationBuilder rootPlacer(RootPlacer placer) {
         rootPlacer = placer;
         return this;
     }
 
+    @Info("The dirt/ground blocks to place below the tree")
     public TreeConfigurationBuilder dirtProvider(BlockStateProvider provider) {
         dirtProvider = provider;
         return this;
     }
 
+    @Info("The minimum size of the tree")
     public TreeConfigurationBuilder minimumSize(FeatureSize size) {
         minimumSize = size;
         return this;
     }
 
+    @Info("Special decorators that can be added to the tree")
     public TreeConfigurationBuilder decorators(List<TreeDecorator> decorators) {
         this.decorators = decorators;
         return this;
     }
 
-    public TreeConfigurationBuilder ignoreVeins() {
+    @Info("Allow the tree to generate if vines are blocking the spawn position")
+    public TreeConfigurationBuilder ignoreVines() {
         ignoreVines = true;
         return this;
     }
 
+    @Info("Forces the dirt blocks to be placed below the tree, even if existing blocks were already dirt-like")
     public TreeConfigurationBuilder forceDirt() {
         forceDirt = true;
         return this;

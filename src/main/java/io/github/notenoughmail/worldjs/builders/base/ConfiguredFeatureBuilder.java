@@ -35,27 +35,32 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
     }
 
     protected static int assertPositive(int val, String name) {
-        if (val < 1) throw new IllegalArgumentException("'" + name + "' must be > 0");
+        if (val < 1)
+            throw new IllegalArgumentException("'" + name + "' must be > 0");
         return val;
     }
 
     protected static int assertNonNegative(int val, String name) {
-        if (val < 0) throw new IllegalArgumentException("'" + name + "' must be >= 0");
+        if (val < 0)
+            throw new IllegalArgumentException("'" + name + "' must be >= 0");
         return val;
     }
 
     protected static int assertRange(int val, int min, int max, String name) {
-        if (val < min || val > max) throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
+        if (val < min || val > max)
+            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
         return val;
     }
 
     protected static float assertRange(float val, float min, float max, String name) {
-        if (val < min || val > max) throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+        if (val < min || val > max)
+            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
         return val;
     }
 
     protected static double assertRange(double val, double min, double max, String name) {
-        if (val < min || val > max) throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+        if (val < min || val > max)
+            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
         return val;
     }
 
@@ -68,21 +73,28 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
     }
 
     protected static IntProvider assertRange(IntProvider provider, int min, int max, String name) {
-        if (provider.getMinValue() < min || provider.getMaxValue() > max) throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
+        if (provider.getMinValue() < min || provider.getMaxValue() > max)
+            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
         return provider;
     }
 
     protected static FloatProvider assertRange(FloatProvider provider, float min, float max, String name) {
-        if (provider.getMinValue() < min || provider.getMaxValue() > max) throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+        if (provider.getMinValue() < min || provider.getMaxValue() > max)
+            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
         return provider;
     }
 
     protected <T> T notNull(T t, String name) {
         if (t == null) {
-            throw new KubeRuntimeException("'" + name + "' must be defined!")
-                    .source(sourceLine);
+            throw exception("'" + name + "' must be defined!");
         }
         return t;
+    }
+
+    protected KubeRuntimeException exception(String message) {
+        return new KubeRuntimeException(message)
+                .source(sourceLine)
+                .customData("configured feature", id);
     }
 
     public transient PlacedFeatureBuilder placedFeature;
@@ -141,9 +153,9 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
 
     public abstract static class WithFeature<FC extends FeatureConfiguration> extends ConfiguredFeatureBuilder<FC> {
 
-        private final Supplier<Feature<FC>> feature;
+        private final Supplier<? extends Feature<FC>> feature;
 
-        public WithFeature(ResourceLocation id, Supplier<Feature<FC>> feature) {
+        public WithFeature(ResourceLocation id, Supplier<? extends Feature<FC>> feature) {
             super(id);
             this.feature = feature;
         }

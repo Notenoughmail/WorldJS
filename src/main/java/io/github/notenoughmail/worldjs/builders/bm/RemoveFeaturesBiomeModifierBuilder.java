@@ -41,7 +41,7 @@ public class RemoveFeaturesBiomeModifierBuilder extends BiomeModifierBuilder<Bio
         return new BiomeModifiers.RemoveFeaturesBiomeModifier(
                 biomes,
                 features,
-                steps
+                steps.isEmpty() ? EnumSet.allOf(GenerationStep.Decoration.class) : steps
         );
     }
 }

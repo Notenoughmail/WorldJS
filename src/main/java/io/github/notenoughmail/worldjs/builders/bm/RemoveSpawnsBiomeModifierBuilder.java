@@ -18,7 +18,7 @@ public class RemoveSpawnsBiomeModifierBuilder extends BiomeModifierBuilder<Biome
         entityTypes = HolderSet.empty();
     }
 
-    @Info("The entity(s) to remove spawn for")
+    @Info("The entity(s) to remove spawns for")
     public RemoveSpawnsBiomeModifierBuilder entityTypes(HolderSet<EntityType<?>> entityTypes) {
         this.entityTypes = entityTypes;
         return this;

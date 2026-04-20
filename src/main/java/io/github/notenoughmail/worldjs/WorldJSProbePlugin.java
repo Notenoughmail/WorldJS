@@ -1,7 +1,5 @@
 package io.github.notenoughmail.worldjs;
 
-import dev.latvian.mods.kubejs.typings.Info;
-import dev.latvian.mods.kubejs.typings.Param;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent.ModifierFunction;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent.ModifierFunctions;
 import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent.ModifierNamespace;
@@ -55,27 +53,30 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             final String functionName = functionsEntry.getKey();
             final ModifierFunctions functions = functionsEntry.getValue();
 
-            for (ModifierFunction func : functions.functions) {
-                final int argLength = func.args().length;
+            for (ModifierFunction func : functions.functions.values()) {
+                final int argLength = func.args().length();
                 if (argLength == 0) {
                     builder.method(functionName, m -> m.returnType(Types.THIS));
                 } else {
                     builder.method(functionName, method -> {
                         method.returnType(Types.THIS);
                         for (int i = 0; i < argLength ; i++) {
-                            method.param(func.argNames()[i], typeConverter.convertType(func.args()[i]));
+                            final PlacedFeatureModifierEvent.Args.Arg arg = func.args().get(i);
+                            method.param(arg.name(), typeConverter.convertType(arg.type()));
                         }
                     });
                 }
-                final Info info = func.info();
+
                 final MethodDecl methodDecl = builder.methods.getLast();
-                if (!info.value().isEmpty()) {
-                    methodDecl.addComment(info.value());
+                if (!func.probeDesc().isEmpty()) {
+                    methodDecl.addComment(func.probeDesc());
                 }
-                if (info.params().length != 0) {
+                if (func.args().length() != 0) {
                     methodDecl.linebreak();
-                    for (Param param : info.params()) {
-                        methodDecl.addComment("@param %s - %s".formatted(param.name(), param.value()));
+                    for (PlacedFeatureModifierEvent.Args.Arg arg : func.args().args()) {
+                        if (!arg.desc().isEmpty()) {
+                            methodDecl.addComment("@param %s - %s".formatted(arg.name(), arg.desc()));
+                        }
                     }
                 }
             }

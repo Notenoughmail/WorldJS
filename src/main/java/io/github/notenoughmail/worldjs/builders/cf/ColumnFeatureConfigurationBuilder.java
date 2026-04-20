@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -7,7 +8,6 @@ import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.ColumnFeatureConfiguration;
 
-// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class ColumnFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<ColumnFeatureConfiguration> {
 
@@ -17,11 +17,13 @@ public class ColumnFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<
         super(id);
     }
 
+    @Info("The max radius of a column, in the range [0, 3]")
     public ColumnFeatureConfigurationBuilder reach(IntProvider provider) {
         reach = assertRange(provider, 0, 3, "reach");
         return this;
     }
 
+    @Info("The maximum height, in the range [1, 10]")
     public ColumnFeatureConfigurationBuilder height(IntProvider provider) {
         height = assertRange(provider, 1, 10, "height");
         return this;

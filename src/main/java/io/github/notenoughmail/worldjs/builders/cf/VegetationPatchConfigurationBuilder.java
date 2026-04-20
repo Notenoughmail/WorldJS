@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.Holder;
@@ -15,7 +16,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.function.Supplier;
 
-// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilder.WithFeature<VegetationPatchConfiguration> {
 
@@ -39,51 +39,61 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
         extraEdgeColumnChance = 0;
     }
 
+    @Info("The blocks that can be replaced with vegetation blocks")
     public VegetationPatchConfigurationBuilder replaceableBlocks(TagKey<Block> blocks) {
         replaceable = blocks;
         return this;
     }
 
+    @Info("The block used for generating the column")
     public VegetationPatchConfigurationBuilder groundState(BlockStateProvider state) {
         groundState = state;
         return this;
     }
 
+    @Info("The feature to place on finding a valid position")
     public VegetationPatchConfigurationBuilder vegetationFeature(Holder.Reference<PlacedFeature> feature) {
         vegetationFeature = feature;
         return this;
     }
 
+    @Info("The surface to palce on")
     public VegetationPatchConfigurationBuilder surface(CaveSurface surface) {
         this.surface = surface;
         return this;
     }
 
+    @Info("The amount of blocks that should be replaced by column, in the range [1, 128]")
     public VegetationPatchConfigurationBuilder depth(IntProvider depth) {
         this.depth = assertRange(depth, 1, 128, "depth");
         return this;
     }
 
+    @Info("The chance to add an extra block to the height, in the range [0, 1]")
     public VegetationPatchConfigurationBuilder extraBottomBlockChance(float chance) {
         extraBottomBlockChance = assertUnit(chance, "extraBottomBlockChance");
         return this;
     }
 
+    @Info("The y radius the column should search in for available placement, in the range [1, 256]")
     public VegetationPatchConfigurationBuilder verticalRange(int range) {
         verticalRange = assertRange(range, 1, 256, "verticalRange");
         return this;
     }
 
+    @Info("The chance of placing the vegetation feature on finding a valid position, in the range [0, 1]")
     public VegetationPatchConfigurationBuilder vegetationChance(float chance) {
         vegetationChance = assertUnit(chance, "vegetationChance");
         return this;
     }
 
-    public VegetationPatchConfigurationBuilder xzRange(IntProvider range) {
-        xzRadius = range;
+    @Info("The radius to search for valid positions in the x and z directions")
+    public VegetationPatchConfigurationBuilder xzRadius(IntProvider radius) {
+        xzRadius = radius;
         return this;
     }
 
+    @Info("The chance to add a search position adjacent next to the initial rectangle, in the range [0, 1]")
     public VegetationPatchConfigurationBuilder extraEdgeColumnChance(float chance) {
         extraEdgeColumnChance = assertUnit(chance, "extraEdgeColumnChance");
         return this;
