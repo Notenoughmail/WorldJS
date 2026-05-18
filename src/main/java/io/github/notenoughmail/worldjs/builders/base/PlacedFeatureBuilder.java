@@ -11,7 +11,7 @@ import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.CustomJavaToJsWrapper;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import io.github.notenoughmail.worldjs.PlacedFeatureModifierEvent;
+import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;

@@ -18,10 +18,10 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.function.*;
 
 @ReturnsSelf
 public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> extends BuilderBase<ConfiguredFeature<FC, Feature<FC>>> {
@@ -78,6 +78,18 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
         return provider;
     }
 
+    protected static IntProvider assertNonNegative(IntProvider provider, String name) {
+        if (provider.getMinValue() < 0)
+            throw new IllegalArgumentException("'" + name + "' must be >= 0");
+        return provider;
+    }
+
+    protected static IntProvider assertPositive(IntProvider provider, String name) {
+        if (provider.getMinValue() < 1)
+            throw new IllegalArgumentException("'" + name + "' must be > 0");
+        return provider;
+    }
+
     protected static FloatProvider assertRange(FloatProvider provider, float min, float max, String name) {
         if (provider.getMinValue() < min || provider.getMaxValue() > max)
             throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
@@ -89,6 +101,19 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
             throw exception("'" + name + "' must be defined!");
         }
         return t;
+    }
+
+    protected <C extends Collection<? extends T>, T> C notEmpty(C collection, String name) {
+        if (collection.isEmpty()) {
+            throw exception("'" + name + "' must not be empty!");
+        }
+        return collection;
+    }
+
+    protected <T> T validate(T t, Function<T, @Nullable String> errorMsgFunc) {
+        final String str = errorMsgFunc.apply(t);
+        if (str == null) return t;
+        throw exception(str);
     }
 
     protected KubeRuntimeException exception(String message) {
@@ -141,7 +166,7 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
 
     public final static class NoneConfig extends WithFeature<NoneFeatureConfiguration> {
 
-        public NoneConfig(ResourceLocation id, Supplier<Feature<NoneFeatureConfiguration>> feature) {
+        public NoneConfig(ResourceLocation id, Supplier<? extends Feature<NoneFeatureConfiguration>> feature) {
             super(id, feature);
         }
 

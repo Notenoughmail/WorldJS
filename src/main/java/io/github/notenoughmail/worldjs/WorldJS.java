@@ -2,21 +2,28 @@ package io.github.notenoughmail.worldjs;
 
 import com.mojang.logging.LogUtils;
 import dev.latvian.mods.kubejs.util.Cast;
-import dev.latvian.mods.rhino.type.TypeInfo;
-import io.github.notenoughmail.worldjs.util.Wrappers;
+import io.github.notenoughmail.worldjs.types.features.WeightedRandomSelectorFeature;
+import io.github.notenoughmail.worldjs.util.Args;
+import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.placement.*;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
+
+import static io.github.notenoughmail.worldjs.util.Types.*;
 
 @Mod(WorldJS.MODID)
 public class WorldJS {
@@ -24,22 +31,29 @@ public class WorldJS {
     public static final String MODID = "worldjs";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public WorldJS() {
-        NeoForge.EVENT_BUS.addListener(this::addVanillaPlacementModifiers);
+    public static ResourceLocation identifier(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
-    private static final TypeInfo BLOCK_PREDICATE = TypeInfo.of(BlockPredicate.class);
-    private static final TypeInfo HEIGHTMAP = TypeInfo.of(Heightmap.Types.class);
+    private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, MODID);
+
+    public static final DeferredHolder<Feature<?>, WeightedRandomSelectorFeature> WEIGHTED_RANDOM_SELECTOR = FEATURES.register("weighted_random_selector", () -> new WeightedRandomSelectorFeature(WeightedRandomSelectorFeature.Configuration.CODEC));
+
+    public WorldJS(IEventBus modBus) {
+        NeoForge.EVENT_BUS.addListener(this::addVanillaPlacementModifiers);
+
+        FEATURES.register(modBus);
+    }
 
     private void addVanillaPlacementModifiers(PlacedFeatureModifierEvent event) {
 
-        final PlacedFeatureModifierEvent.Args anchorRange =
-                event.arg("minInclusive", Wrappers.VERTICAL_ANCHOR, "The lower placement bound")
-                        .arg("maxInclusive", Wrappers.VERTICAL_ANCHOR, "The upper placement bound");
+        final Args anchorRange =
+                event.arg("minInclusive", VERTICAL_ANCHOR, "The lower placement bound")
+                        .arg("maxInclusive", VERTICAL_ANCHOR, "The upper placement bound");
 
-        final PlacedFeatureModifierEvent.Args.Arg n2c, nf, hs, vs, ds, tc, ms, rth, rti, rta;
+        final Args.Arg n2c, nf, hs, vs, ds, tc, ms, rth, rti, rta;
 
-        event.namespace("minecraft")
+        var mc = event.namespace("minecraft")
                 .unit(
                         "biome",
                         BiomeFilter.biome(),
@@ -53,9 +67,13 @@ public class WorldJS {
                 .<IntProvider>registerSingleArg(
                         "count",
                         "count",
-                        Wrappers.INT_PROVIDER,
+                        INT_PROVIDER,
                         "How many times the placed feature should be placed",
-                        CountPlacement::of,
+                        i -> {
+                            if (i.getMinValue() < 0 || i.getMaxValue() > 256)
+                                throw new IllegalArgumentException("'count' must be in the range [0, 256]");
+                            return CountPlacement.of(i);
+                        },
                         "Add a 'minecraft:count' placement modifier"
                 )
                 .registerSingleArg(
@@ -66,10 +84,10 @@ public class WorldJS {
                         FixedPlacement::of,
                         "Add a 'minecraft:fixed_placement' placement modifier"
                 )
-                .registerSingleArg(
+                .<Integer>registerSingleArg(
                         "rarityFilter",
                         "chance",
-                        int.class,
+                        INT,
                         "The chance the feature will successfully place as `1/chance`",
                         i -> {
                             if (i < 1)
@@ -82,7 +100,7 @@ public class WorldJS {
                         "carvingMask",
                         "carvingStep",
                         GenerationStep.Carving.class,
-                        "The carving step volume for which the feature can place",
+                        "The carving step volume for which the feature will try to place in",
                         CarvingMaskPlacement::forStep,
                         "Add a 'minecraft:carving_mask' placement modifier"
                 )
@@ -96,9 +114,9 @@ public class WorldJS {
                 )
                 .register(
                         "noiseBasedCount",
-                        event.arg(n2c = event.singleArg("noiseToCountRatio", int.class, "Ratio of noise value to count"))
-                                .arg(nf = event.singleArg("noiseFactor", double.class, "Horizontal scale factor of the noise. Higher values make wider, more spaced out peaks"))
-                                .arg("noiseOffset", double.class, "Vertical offset of the noise"),
+                        event.arg(n2c = event.singleArg("noiseToCountRatio", INT, "Ratio of noise value to count"))
+                                .arg(nf = event.singleArg("noiseFactor", DOUB, "Horizontal scale factor of the noise. Higher values make wider, more spaced out peaks"))
+                                .arg("noiseOffset", DOUB, "Vertical offset of the noise. Optional, defaults to 0"),
                         a -> NoiseBasedCountPlacement.of(
                                 i(a[0]),
                                 d(a[1]),
@@ -118,9 +136,9 @@ public class WorldJS {
                 )
                 .register(
                         "noiseThresholdCount",
-                        event.arg("noiseLevel", double.class, "The threshold for determining if to use `belowNoise` or `aboveNoise`")
-                                .arg("belowNoise", int.class, "The count used when below the threshold")
-                                .arg("aboveNoise", int.class, "The count used when above the threshold"),
+                        event.arg("noiseLevel", DOUB, "The threshold for determining if to use `belowNoise` or `aboveNoise`")
+                                .arg("belowNoise", INT, "The count used when below the threshold")
+                                .arg("aboveNoise", INT, "The count used when above the threshold"),
                         a -> NoiseThresholdCountPlacement.of(
                                 d(a[0]),
                                 i(a[1]),
@@ -130,8 +148,8 @@ public class WorldJS {
                 )
                 .register(
                         "randomOffset",
-                        event.arg(hs = event.singleArg("xzSpread", Wrappers.INT_PROVIDER, "The horizontal spread"))
-                                .arg(vs = event.singleArg("ySpread", Wrappers.INT_PROVIDER, "The vertical spread")),
+                        event.arg(hs = event.singleArg("xzSpread", INT_PROVIDER, "The horizontal spread"))
+                                .arg(vs = event.singleArg("ySpread", INT_PROVIDER, "The vertical spread")),
                         a -> {
                             final IntProvider xz = intProvider(a[0]), y = intProvider(a[1]);
                             if (xz.getMaxValue() < -16 || y.getMinValue() < -16 || xz.getMaxValue() > 16 || y.getMaxValue() > 16)
@@ -163,7 +181,7 @@ public class WorldJS {
                 .<IntProvider>registerSingleArg(
                         "countOnEveryLayer",
                         "count",
-                        Wrappers.INT_PROVIDER,
+                        INT_PROVIDER,
                         "The number of times to place per layer",
                         i -> {
                             if (i.getMinValue() < 0 || i.getMaxValue() > 256)
@@ -174,10 +192,10 @@ public class WorldJS {
                 )
                 .register(
                         "environmentScan",
-                        event.arg(ds = event.singleArg("directionOfSearch", Direction.class, "The direction to search in"))
+                        event.arg(ds = event.singleArg("directionOfSearch", DIRECTION, "The direction to search in"))
                                 .arg(tc = event.singleArg("targetCondition", BLOCK_PREDICATE, "the condition for a valid block"))
                                 .arg("allowedSearchCondition", BLOCK_PREDICATE, "the condition that steps in the scan must pass")
-                                .arg(ms = event.singleArg("maxSteps", int.class, "The maximum number of blocks, in the range [1, 32], out from the original position to check")),
+                                .arg(ms = event.singleArg("maxSteps", INT, "The maximum number of blocks, in the range [1, 32], out from the original position to check")),
                         a -> {
                             final int step = i(a[3]);
                             if (step < 1 || step > 32)
@@ -209,8 +227,8 @@ public class WorldJS {
                 .register(
                         "surfaceRelativeThreshold",
                         event.arg(rth = event.singleArg("heightmap", HEIGHTMAP, "The heightmap to be within range of"))
-                                .arg(rti = event.singleArg("minInclusive", int.class, "The minimum relative height from the surface to the position"))
-                                .arg(rta = event.singleArg("maxInclusive", int.class, "The maximum relative height from the surface to the position")),
+                                .arg(rti = event.singleArg("minInclusive", INT, "The minimum relative height from the surface to the position"))
+                                .arg(rta = event.singleArg("maxInclusive", INT, "The maximum relative height from the surface to the position")),
                         a -> SurfaceRelativeThresholdFilter.of(
                                 Cast.to(a[0]),
                                 i(a[1]),
@@ -241,8 +259,8 @@ public class WorldJS {
                 .registerSingleArg(
                         "surfaceWaterDepth",
                         "maxWaterDepth",
-                        int.class,
-                        "The maximum water depth of water under which the feature can be placed",
+                        INT,
+                        "The maximum depth of water under which the feature can be placed",
                         SurfaceWaterDepthFilter::forMaxDepth,
                         "Add a 'minecraft:surface_water_depth_filter' placement filter"
                 )
@@ -283,12 +301,16 @@ public class WorldJS {
                 .<VerticalAnchor>registerSingleArg(
                         "constantHeightRange",
                         "height",
-                        Wrappers.VERTICAL_ANCHOR,
+                        VERTICAL_ANCHOR,
                         "The height to place at",
                         v -> HeightRangePlacement.of(ConstantHeight.of(v)),
                         "Add a 'minecraft:height_range' placement modifier which places the feature at the exact height given"
                 )
         ;
+
+        if (!FMLEnvironment.production) {
+            mc.printAll();
+        }
     }
 
     private static IntProvider intProvider(Object o) {

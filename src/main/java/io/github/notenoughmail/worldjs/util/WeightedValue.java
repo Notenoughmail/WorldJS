@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  *     ]
  * </code></pre>
  * <p>
- * A single {@code WeightedValue} or a null instance within a list is meaningless and should not occur
+ * A single {@code WeightedValue} or a null/undefined instance within a list is meaningless and should not occur
  */
 @Info(
         value = "A weighted value",
@@ -52,13 +52,13 @@ import java.util.function.Consumer;
 )
 public record WeightedValue<T>(int weight, T value) {
 
-    public static <T> SimpleWeightedRandomList<T> toVanilla(List<WeightedValue<T>> weightedValues) {
+    public static <T, E extends T> SimpleWeightedRandomList<T> toVanilla(List<WeightedValue<E>> weightedValues) {
         return switch (weightedValues.size()) {
             case 0 -> SimpleWeightedRandomList.empty();
             case 1 -> SimpleWeightedRandomList.single(weightedValues.getFirst().value);
             default -> {
                 final SimpleWeightedRandomList.Builder<T> b = SimpleWeightedRandomList.builder();
-                for (WeightedValue<T> w : weightedValues) {
+                for (WeightedValue<E> w : weightedValues) {
                     b.add(w.value(), w.weight());
                 }
                 yield b.build();
@@ -70,14 +70,25 @@ public record WeightedValue<T>(int weight, T value) {
         return TypeInfo.RAW_LIST.withParams(TYPE.withParams(generic));
     }
 
+    public static TypeInfo listType(Class<?> generic) {
+        return listType(TypeInfo.of(generic));
+    }
+
     public static final RecordTypeInfo TYPE = Cast.to(TypeInfo.of(WeightedValue.class));
     private static final TypeInfo CONSUMER_TYPE = TypeInfo.RAW_CONSUMER.withParams(TypeInfo.RAW_MAP.withParams(TypeInfo.STRING, TypeInfo.NONE));
 
     public static WeightedValue<?> wrap(Context ctx, Object from, TypeInfo target) {
         return switch (from) {
             case null -> throw Context.reportRuntimeError("Can't interpret 'null' as a weighted value", ctx);
-            case WeightedValue<?> w -> w;
-            case Map<?, ?> m -> c(ctx, m, target);
+            case WeightedValue<?> w -> {
+                final TypeInfo param = target.param(0);
+                try {
+                    yield new WeightedValue<>(w.weight(), ctx.jsToJava(w.value(), param));
+                } catch (Exception e) {
+                    throw Context.reportRuntimeError("Cannot convert '%s' to %s".formatted(w.value(), param.signature()), ctx);
+                }
+            }
+            case Map<?, ?> m when m.containsKey("value") -> c(ctx, m, target);
             case Iterable<?> itr -> c(ctx, itr, target);
             case Callable c -> c(ctx, c, target);
             case Object o when Undefined.isUndefined(o) -> throw Context.reportRuntimeError("Can't interpret 'undefined' as a weighted value", ctx);
@@ -114,7 +125,7 @@ public record WeightedValue<T>(int weight, T value) {
                             target.param(0)
             );
         }
-        return make(args[0], args[1]);
+        return make(args[0], args[1], ctx);
     }
 
     private static WeightedValue<?> fromMap(Map<String, ?> from, Context ctx, TypeInfo target) {
@@ -134,10 +145,13 @@ public record WeightedValue<T>(int weight, T value) {
                 );
             }
         }
-        return make(args[0], args[1]);
+        return make(args[0], args[1], ctx);
     }
 
-    private static WeightedValue<?> make(Object weight, Object value) {
-        return new WeightedValue<>((int) weight, value);
+    private static WeightedValue<?> make(Object weight, Object value, Context ctx) {
+        final int w = (int) weight;
+        if (w < 1)
+            throw Context.reportRuntimeError("Weight cannot be less than 1!", ctx);
+        return new WeightedValue<>(w, value);
     }
 }

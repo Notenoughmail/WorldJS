@@ -57,13 +57,13 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
         return this;
     }
 
-    @Info("The surface to palce on")
+    @Info("The surface to place on")
     public VegetationPatchConfigurationBuilder surface(CaveSurface surface) {
         this.surface = surface;
         return this;
     }
 
-    @Info("The amount of blocks that should be replaced by column, in the range [1, 128]")
+    @Info("The amount of blocks that should be replaced by the column, in the range [1, 128]")
     public VegetationPatchConfigurationBuilder depth(IntProvider depth) {
         this.depth = assertRange(depth, 1, 128, "depth");
         return this;

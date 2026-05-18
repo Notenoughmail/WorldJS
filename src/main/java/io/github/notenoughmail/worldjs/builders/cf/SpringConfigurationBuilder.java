@@ -16,14 +16,14 @@ import net.minecraft.world.level.material.FluidState;
 public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringConfiguration> {
 
     public transient FluidState fluidState;
-    public transient boolean requiresRockBelow;
+    public transient boolean requiresBlockBelow;
     public transient int rockCount, holeCount;
     public transient HolderSet<Block> validBlocks;
 
     public SpringConfigurationBuilder(ResourceLocation id) {
         super(id);
         fluidState = Blocks.AIR.defaultBlockState().getFluidState();
-        requiresRockBelow = true;
+        requiresBlockBelow = true;
         rockCount = 4;
         holeCount = 1;
         validBlocks = HolderSet.empty();
@@ -41,8 +41,8 @@ public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringC
     }
 
     @Info("If the spring requires a block matching the spring's valid blocks below it")
-    public SpringConfigurationBuilder requiresRocksBelow(boolean required) {
-        requiresRockBelow = required;
+    public SpringConfigurationBuilder requiresBlockBelow(boolean required) {
+        requiresBlockBelow = required;
         return this;
     }
 
@@ -52,7 +52,7 @@ public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringC
         return this;
     }
 
-    @Info("The number of air blocks that must be adjacent to the spring for ti to generate")
+    @Info("The number of air blocks that must be adjacent to the spring for it to generate")
     public SpringConfigurationBuilder holeCount(int count) {
         holeCount = count;
         return this;
@@ -68,7 +68,7 @@ public class SpringConfigurationBuilder extends ConfiguredFeatureBuilder<SpringC
     protected SpringConfiguration createFeatureConfiguration() {
         return new SpringConfiguration(
                 fluidState,
-                requiresRockBelow,
+                requiresBlockBelow,
                 rockCount,
                 holeCount,
                 validBlocks

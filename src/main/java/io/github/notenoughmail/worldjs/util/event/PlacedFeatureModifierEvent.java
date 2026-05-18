@@ -1,12 +1,17 @@
-package io.github.notenoughmail.worldjs;
+package io.github.notenoughmail.worldjs.util.event;
 
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.Scriptable;
+import dev.latvian.mods.rhino.type.ClassTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import dev.latvian.mods.rhino.type.TypeStringContext;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import io.github.notenoughmail.worldjs.WorldJS;
 import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Args;
+import io.github.notenoughmail.worldjs.util.ArgEvent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
@@ -15,7 +20,7 @@ import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.*;
 
-public class PlacedFeatureModifierEvent extends Event {
+public class PlacedFeatureModifierEvent extends Event implements ArgEvent {
 
     public static Map<String, ModifierNamespace> createNamespaces() {
         final Map<String, ModifierNamespace> m = new HashMap<>();
@@ -36,87 +41,67 @@ public class PlacedFeatureModifierEvent extends Event {
         return builder.computeIfAbsent(namespace, ModifierNamespace::new);
     }
 
-    /**
-     * Start argument and type information about a synthetic function
-     */
-    public Args arg(String name, TypeInfo type, String desc) {
-        return new Args(new ArrayList<>()).arg(name, type, desc);
-    }
-
-    /**
-     * Start argument and type information about a synthetic function
-     */
-    public Args arg(String name, Class<?> clazz, String desc) {
-        return arg(name, TypeInfo.of(clazz), desc);
-    }
-
-    /**
-     * Start arguemnt and type information about a synthetic function
-     */
-    public Args arg(Args.Arg arg) {
-        return new Args(new ArrayList<>()).arg(arg);
-    }
-
-    /**
-     * Create a single, standalone argument. Useful for reusing an arg between different functions
-     */
-    public Args.Arg singleArg(String name, TypeInfo type, String desc) {
-        return new Args.Arg(name, type, desc);
-    }
-
-    /**
-     * Create a single, standalone argument. Useful for reusing an arg between different functions
-     */
-    public Args.Arg singleArg(String name, Class<?> type, String desc) {
-        return singleArg(name, TypeInfo.of(type), desc);
-    }
-
-    public record Args(List<Arg> args) {
-
-        static final Args EMPTY = new Args(List.of());
-
-        /**
-         * Add an argument to the argument list
-         */
-        public Args arg(String name, TypeInfo type, String desc) {
-            return arg(new Arg(name, type, desc));
-        }
-
-        /**
-         * Add an argument to the argument list
-         */
-        public Args arg(String name, Class<?> clazz, String desc) {
-            return arg(name, TypeInfo.of(clazz), desc);
-        }
-
-        /**
-         * Add a single, pre-existing argument to the arg list. See {@link #singleArg(String, TypeInfo, String)}
-         */
-        public Args arg(Arg arg) {
-            args.add(arg);
-            return this;
-        }
-
-        public int length() {
-            return args.size();
-        }
-
-        public Arg get(int i) {
-            return args.get(i);
-        }
-
-        public record Arg(String name, TypeInfo type, String desc) {}
-    }
-
     public class ModifierNamespace extends BaseFunction {
 
         @HideFromJS
-        public final Map<String, ModifierFunctions> functions = new HashMap<>();
+        public final Map<String, ModifierFunctions> functions = new LinkedHashMap<>();
 
         public final String namespace;
 
         ModifierNamespace(String name) {
             namespace = name;
+        }
+
+        /**
+         * Prints all methods registered to the namespace in a Markdown compliant and standardized format, helpful for
+         * easily getting info onto a wiki or copying over changes to methods
+         */
+        @HideFromJS
+        public void printAll() {
+            WorldJS.LOGGER.info("Dumping methods registered to namespace {}", namespace);
+
+            final TypeStringContext PRINT_CTX = new TypeStringContext() {
+                @Override
+                public void appendClassName(StringBuilder sb, ClassTypeInfo type) {
+                    sb.append(type.asClass().getSimpleName());
+                }
+            };
+
+            final StringBuilder builder = new StringBuilder("\n");
+
+            for (Map.Entry<String, ModifierFunctions> entry : functions.entrySet()) {
+                final String methodName = entry.getKey();
+                final ModifierFunctions funcs = entry.getValue();
+
+                for (ModifierFunction func : funcs.functions.values()) {
+                    builder.append("- `.").append(methodName).append("(");
+
+                    if (func.args().length() != 0) {
+                        final Iterator<Args.Arg> iter = func.args().args().iterator();
+                        while (iter.hasNext()) {
+                            final Args.Arg arg = iter.next();
+                            builder.append(arg.name()).append(": ").append(PRINT_CTX.toString(arg.type()));
+                            if (iter.hasNext()) {
+                                builder.append(", ");
+                            }
+                        }
+                    }
+
+                    builder.append(")`: ").append(func.probeDesc());
+
+                    for (Args.Arg arg : func.args.args()) {
+                        builder.append("\n\t- `")
+                                .append(arg.name())
+                                .append(": ")
+                                .append(PRINT_CTX.toString(arg.type()))
+                                .append("`: ")
+                                .append(arg.desc());
+                    }
+
+                    builder.append("\n");
+                }
+            }
+            WorldJS.LOGGER.info(builder.toString());
         }
 
         /**
@@ -236,7 +221,7 @@ public class PlacedFeatureModifierEvent extends Event {
         @Override
         public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
             final int argLength = args.length;
-            final ModifierFunction func = functions.get(args.length);
+            final ModifierFunction func = functions.get(argLength);
             if (func != null) {
                 if (argLength == 0) {
                     PlacedFeatureBuilder.Modifiers.accept(func.call(args));
@@ -249,14 +234,14 @@ public class PlacedFeatureModifierEvent extends Event {
                     throw Context.throwAsScriptRuntimeEx(t, cx);
                 }
             }
-            throw Context.reportRuntimeError("No method '%s' with %s params found".formatted(name, args.length), cx);
+            throw Context.reportRuntimeError("No function '%s' with %s params found".formatted(name, argLength), cx);
         }
     }
 
     public record ModifierFunction(Args args, Method<Object[]> method, String probeDesc) {
 
-        PlacementModifier call(Object[] params) throws IllegalArgumentException{
-            return method.invoke(params);
+        PlacementModifier call(Object[] casted) throws IllegalArgumentException{
+            return method.invoke(casted);
         }
 
         PlacementModifier call(Object[] params, Context ctx) {

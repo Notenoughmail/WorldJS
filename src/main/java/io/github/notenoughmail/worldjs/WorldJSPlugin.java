@@ -9,7 +9,6 @@ import dev.latvian.mods.kubejs.registry.ServerRegistryRegistry;
 import dev.latvian.mods.kubejs.script.RecordDefaultsRegistry;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.bm.*;
@@ -18,6 +17,8 @@ import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -77,6 +79,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
             cf(c, "block_column", BlockColumnConfigurationBuilder.class, BlockColumnConfigurationBuilder::new);
             cf(c, "vegetation_patch", VegetationPatchConfigurationBuilder.class, Feature.VEGETATION_PATCH, VegetationPatchConfigurationBuilder::new);
             cf(c, "waterlogged_vegetation_patch", VegetationPatchConfigurationBuilder.class, Feature.WATERLOGGED_VEGETATION_PATCH, VegetationPatchConfigurationBuilder::new);
+            // Doc cutoff
             cf(c, "root_system", RootSystemConfigurationBuilder.class, RootSystemConfigurationBuilder::new);
             cf(c, "multiface_growth", MultifaceGrowthConfigurationBuilder.class, MultifaceGrowthConfigurationBuilder::new);
             cf(c, "underwater_magma", UnderwaterMagmaConfigurationBuilder.class, UnderwaterMagmaConfigurationBuilder::new);
@@ -107,8 +110,10 @@ public class WorldJSPlugin implements KubeJSPlugin {
             cf(c, "large_dripstone", LargeDripstoneConfigurationBuilder.class, LargeDripstoneConfigurationBuilder::new);
             cf(c, "pointed_dripstone", PointedDripstoneConfigurationBuilder.class, PointedDripstoneConfigurationBuilder::new);
             cf(c, "sculk_patch", SculkPatchConfigurationBuilder.class, SculkPatchConfigurationBuilder::new);
+            add(c, WorldJS.identifier("weighted_random_selector"), WeightedRandomSelectorBuilder.class, WeightedRandomSelectorBuilder::new);
         });
         registry.of(NeoForgeRegistries.Keys.BIOME_MODIFIERS, c -> {
+            bm(c, "none", NoneBiomeModifierBuilder.class, NoneBiomeModifierBuilder::new);
             bm(c, "add_features", AddFeaturesBiomeModifierBuilder.class, AddFeaturesBiomeModifierBuilder::new);
             bm(c, "remove_features", RemoveFeaturesBiomeModifierBuilder.class, RemoveFeaturesBiomeModifierBuilder::new);
             bm(c, "add_spawns", AddSpawnsBiomeModifierBuilder.class, AddSpawnsBiomeModifierBuilder::new);
@@ -136,7 +141,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
         cf(callback, name, ConfiguredFeatureBuilder.NoneConfig.class, feature, ConfiguredFeatureBuilder.NoneConfig::new);
     }
 
-    private static <M extends BiomeModifier, B extends BiomeModifierBuilder<M>> void bm(BuilderTypeRegistry.Callback<BiomeModifier> callback, String name, Class<B> builderType, Function<ResourceLocation, B> factory) {
+    private static <M extends BiomeModifier, B extends BuilderBase<M>> void bm(BuilderTypeRegistry.Callback<BiomeModifier> callback, String name, Class<B> builderType, Function<ResourceLocation, B> factory) {
         add(callback, KubeJS.id(name), builderType, factory::apply);
     }
 
@@ -146,18 +151,33 @@ public class WorldJSPlugin implements KubeJSPlugin {
         registry.register(BlockStateProvider.class, Wrappers::blockStateProvider);
         registry.register(VerticalAnchor.class, Wrappers::verticalAnchor);
         registry.register(HeightProvider.class, Wrappers::heightProvider);
+        registry.register(BlockPredicate.class, Wrappers::blockPredicate);
         registry.registerCodec(TrunkPlacer.class, TrunkPlacer.CODEC);
         registry.registerCodec(FoliagePlacer.class, FoliagePlacer.CODEC);
         registry.registerCodec(RootPlacer.class, RootPlacer.CODEC);
         registry.registerCodec(FeatureSize.class, FeatureSize.CODEC);
         registry.registerCodec(TreeDecorator.class, TreeDecorator.CODEC);
         registry.registerAlias(OreConfiguration.TargetBlockState.class, Wrappers.TargetBlockState.class, Wrappers.TargetBlockState::convert);
-        registry.registerCodec(BlockPredicate.class, BlockPredicate.CODEC);
     }
 
     @Override
     public void registerRecordDefaults(RecordDefaultsRegistry registry) {
         registry.register(new AddSpawnsBiomeModifierBuilder.Spawn(null, 1, 0, 1));
+        registry.register(new GeodeConfigurationBuilder.Blocks(
+                BlockStateProvider.simple(Blocks.AIR),
+                BlockStateProvider.simple(Blocks.AMETHYST_BLOCK),
+                BlockStateProvider.simple(Blocks.BUDDING_AMETHYST),
+                BlockStateProvider.simple(Blocks.CALCITE),
+                BlockStateProvider.simple(Blocks.SMOOTH_BASALT),
+                List.of(
+                        Blocks.SMALL_AMETHYST_BUD.defaultBlockState(),
+                        Blocks.MEDIUM_AMETHYST_BUD.defaultBlockState(),
+                        Blocks.LARGE_AMETHYST_BUD.defaultBlockState(),
+                        Blocks.AMETHYST_CLUSTER.defaultBlockState()
+                ),
+                BlockTags.FEATURES_CANNOT_REPLACE,
+                BlockTags.GEODE_INVALID_BLOCKS
+        ));
     }
 
     @Override

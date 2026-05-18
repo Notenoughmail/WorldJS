@@ -59,7 +59,8 @@ neoForge {
         minecraftVersion = project.parchment_minecraft_version
     }
 
-    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+    validateAccessTransformers = true
 
     runs {
         client {
@@ -109,7 +110,7 @@ configurations {
 dependencies {
     implementation "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
     implementation "dev.latvian.mods:rhino:${rhino_version}"
-    implementation "curse.maven:probejs-585406:7105159"
+    implementation "curse.maven:probejs-585406:8093570"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

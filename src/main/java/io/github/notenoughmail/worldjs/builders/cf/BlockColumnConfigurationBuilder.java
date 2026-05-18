@@ -40,7 +40,7 @@ public class BlockColumnConfigurationBuilder extends ConfiguredFeatureBuilder<Bl
     )
     public BlockColumnConfigurationBuilder layer(IntProvider height, BlockStateProvider state) {
         layers.add(BlockColumnConfiguration.layer(
-                assertRange(height, 1, Integer.MAX_VALUE, "height"),
+                assertNonNegative(height, "height"),
                 state
         ));
         return this;
@@ -58,7 +58,7 @@ public class BlockColumnConfigurationBuilder extends ConfiguredFeatureBuilder<Bl
         return this;
     }
 
-    @Info("Makes the column remove layers form the start of column when space is restricted")
+    @Info("Makes the column remove layers from the start of column when space is restricted")
     public BlockColumnConfigurationBuilder prioritizeTip() {
         prioritizeTip = true;
         return this;

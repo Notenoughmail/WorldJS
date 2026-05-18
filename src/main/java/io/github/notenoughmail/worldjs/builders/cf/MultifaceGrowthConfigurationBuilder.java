@@ -67,7 +67,7 @@ public class MultifaceGrowthConfigurationBuilder extends ConfiguredFeatureBuilde
         return this;
     }
 
-    @Info("The block(s) the placed blcok can be placed on")
+    @Info("The block(s) the placed block can be placed on")
     public MultifaceGrowthConfigurationBuilder canBePlacedOn(HolderSet<Block> blocks) {
         canBePlacedOn = blocks;
         return this;

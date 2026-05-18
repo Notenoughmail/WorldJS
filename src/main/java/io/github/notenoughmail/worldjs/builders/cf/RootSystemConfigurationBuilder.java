@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cf;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.core.Holder;
@@ -12,11 +13,10 @@ import net.minecraft.world.level.levelgen.feature.configurations.RootSystemConfi
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
-// TODO: 1.0.0 | JSDoc
 @ReturnsSelf
 public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<RootSystemConfiguration> {
 
-    public transient Holder.Reference<PlacedFeature> treeFeature;
+    public transient Holder.Reference<PlacedFeature> feature;
     public transient int requiredVerticalSpaceForTree, rootRadius, rootPlacementAttempts, rootColumnMaxHeight,
             hangingRootRadius, hangingRootsVerticalSpan, hangingRootPlacementAttempts, allowedVerticalWaterForTree;
     public transient TagKey<Block> rootReplaceable;
@@ -30,66 +30,79 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
                 = hangingRootPlacementAttempts = allowedVerticalWaterForTree = 1;
     }
 
-    public RootSystemConfigurationBuilder treeFeature(Holder.Reference<PlacedFeature> feature) {
-        treeFeature = feature;
+    @Info("The feature to place on top of the root system")
+    public RootSystemConfigurationBuilder feature(Holder.Reference<PlacedFeature> feature) {
+        this.feature = feature;
         return this;
     }
 
+    @Info("The vertical space required for the tree feature to generate, in the range [1, 64]")
     public RootSystemConfigurationBuilder requiredVerticalSpaceForTree(int space) {
         requiredVerticalSpaceForTree = assertRange(space, 1, 64, "requiredVerticalSpaceForTree");
         return this;
     }
 
+    @Info("The radius to place roots in, in the range [1, 64]")
     public RootSystemConfigurationBuilder rootRadius(int radius) {
         rootRadius = assertRange(radius, 1, 64, "rootRadius");
         return this;
     }
 
+    @Info("The blocks that can be replaced by roots")
     public RootSystemConfigurationBuilder rootReplaceable(TagKey<Block> replaceable) {
         rootReplaceable = replaceable;
         return this;
     }
 
+    @Info("The block to use for the root column")
     public RootSystemConfigurationBuilder rootStateProvider(BlockStateProvider provider) {
         rootStateProvider = provider;
         return this;
     }
 
+    @Info("The number of times to try to place the roots, in the range [1, 256]")
     public RootSystemConfigurationBuilder rootPlacementAttempts(int attempts) {
         rootPlacementAttempts = assertRange(attempts, 1, 256, "rootPlacementAttempts");
         return this;
     }
 
+    @Info("The maximum height of the root column, in the range [1, 4096]")
     public RootSystemConfigurationBuilder rootColumnMaxHeight(int height) {
         rootColumnMaxHeight = assertRange(height, 1, 4096, "rootColumnMaxHeight");
         return this;
     }
 
+    @Info("The radius at which to place hanging roots, in the range [1, 64]")
     public RootSystemConfigurationBuilder hangingRootRadius(int radius) {
         hangingRootRadius = assertRange(radius, 1, 64, "hangingRootRadius");
         return this;
     }
 
+    @Info("The vertical range over which to place hanging roots, in the range [0, 16]")
     public RootSystemConfigurationBuilder hangingRootsVerticalSpan(int span) {
         hangingRootsVerticalSpan = assertRange(span, 0, 16, "hangingRootsVerticalSpan");
         return this;
     }
 
+    @Info("The block to use hanging below the root column")
     public RootSystemConfigurationBuilder hangingRootStateProvider(BlockStateProvider provider) {
         hangingRootStateProvider = provider;
         return this;
     }
 
+    @Info("The number of times to try to place the hanging roots, in the range [1, 256]")
     public RootSystemConfigurationBuilder hangingRootPlacementAttempts(int attempts) {
         hangingRootPlacementAttempts = assertRange(attempts, 1, 256, "hangingRootPlacementAttempts");
         return this;
     }
 
+    @Info("The maximum allowable submerged height the tree may be in, in the range [1, 64]")
     public RootSystemConfigurationBuilder allowedVerticalWaterForTree(int allowed) {
         allowedVerticalWaterForTree = assertRange(allowed, 1, 64, "allowedVerticalWaterForTree");
         return this;
     }
 
+    @Info("The validator for the tree's position")
     public RootSystemConfigurationBuilder allowedTreePosition(BlockPredicate allowed) {
         allowedTreePosition = allowed;
         return this;
@@ -98,7 +111,7 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
     @Override
     protected RootSystemConfiguration createFeatureConfiguration() {
         return new RootSystemConfiguration(
-                notNull(treeFeature, "treeFeature"),
+                notNull(feature, "feature"),
                 requiredVerticalSpaceForTree,
                 rootRadius,
                 notNull(rootReplaceable, "rootReplaceable"),

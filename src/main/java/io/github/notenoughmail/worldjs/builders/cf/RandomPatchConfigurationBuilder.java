@@ -47,6 +47,7 @@ public class RandomPatchConfigurationBuilder extends ConfiguredFeatureBuilder.Wi
         return xzSpread(xzSpread).ySpread(ySpread);
     }
 
+    @Info("The base feature to place")
     public RandomPatchConfigurationBuilder feature(Holder.Reference<PlacedFeature> placedFeature) {
         feature = placedFeature;
         return this;

@@ -64,7 +64,7 @@ public class TreeConfigurationBuilder extends ConfiguredFeatureBuilder<TreeConfi
         return this;
     }
 
-    @Info("The root placer, defines the root blocks nad how they generate")
+    @Info("The root placer, defines the root blocks and how they generate")
     public TreeConfigurationBuilder rootPlacer(RootPlacer placer) {
         rootPlacer = placer;
         return this;
@@ -88,7 +88,7 @@ public class TreeConfigurationBuilder extends ConfiguredFeatureBuilder<TreeConfi
         return this;
     }
 
-    @Info("Allow the tree to generate if vines are blocking the spawn position")
+    @Info("Allow the tree to ignore vines blocking its spawn position")
     public TreeConfigurationBuilder ignoreVines() {
         ignoreVines = true;
         return this;
