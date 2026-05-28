@@ -1,7 +1,6 @@
-package io.github.notenoughmail.worldjs.util;
+package io.github.notenoughmail.worldjs.util.synmethod;
 
 import dev.latvian.mods.rhino.type.TypeInfo;
-import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public record Args(List<Arg> args) {
     }
 
     /**
-     * Add a single, pre-existing argument to the arg list. See {@link ArgEvent#singleArg(String, TypeInfo, String)}
+     * Add a single, pre-existing argument to the arg list. See {@link SyntheticFunctionEvent#singleArg(String, TypeInfo, String)}
      */
     public Args arg(Arg arg) {
         args.add(arg);

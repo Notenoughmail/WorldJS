@@ -21,7 +21,11 @@ public class SculkPatchConfigurationBuilder extends ConfiguredFeatureBuilder<Scu
 
     public SculkPatchConfigurationBuilder(ResourceLocation id) {
         super(id);
-        chargeCount = amountPerCharge = spreadAttempts = 1;
+        chargeCount
+                = amountPerCharge
+                = spreadAttempts
+                = growthRounds
+                = 1;
     }
 
     @Info("The number of charges, in the range [1, 32]")

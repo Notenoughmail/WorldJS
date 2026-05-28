@@ -44,7 +44,7 @@ public class SpikeConfigurationBuilder extends ConfiguredFeatureBuilder<SpikeCon
                     @Param(name = "centerZ", value = "The z coordinate"),
                     @Param(name = "radius", value = "The radius of the spike"),
                     @Param(name = "height", value = "The height of the spike"),
-                    @Param(name = "guarded", value = "If the crystal on the spike should have an iron-bar cage")
+                    @Param(name = "guarded", value = "If the crystal on the spike should have an iron bar cage")
             }
     )
     public SpikeConfigurationBuilder spike(int centerX, int centerZ, int radius, int height, boolean guarded) {

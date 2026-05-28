@@ -25,10 +25,15 @@ public class DripstoneClusterConfigurationBuilder extends ConfiguredFeatureBuild
 
     public DripstoneClusterConfigurationBuilder(ResourceLocation id) {
         super(id);
-        maxStalHeightDiff = heightDeviation = maxDistFromCenterAffectingHeightBias = maxDistFromEdgeAffectingChanceOfDripstoneColumn = 1;
+        floorToCeilingSearchRange
+                = maxStalHeightDiff
+                = heightDeviation
+                = maxDistFromCenterAffectingHeightBias
+                = maxDistFromEdgeAffectingChanceOfDripstoneColumn
+                = 1;
     }
 
-    @Info("How many blocks the feature searches floor-to-ceiling, in the range [0, 512]")
+    @Info("How many blocks the feature searches floor-to-ceiling, in the range [1, 512]")
     public DripstoneClusterConfigurationBuilder floorToCeilingSearchRange(int range) {
         floorToCeilingSearchRange = assertRange(range, 1, 512, "floorToCeilingSearchRange");
         return this;
@@ -70,7 +75,7 @@ public class DripstoneClusterConfigurationBuilder extends ConfiguredFeatureBuild
         return this;
     }
 
-    @Info("The chance of also placing a pool, in the range [0, 1]")
+    @Info("The chance of also placing a pool, in the range [0, 2]")
     public DripstoneClusterConfigurationBuilder wetness(FloatProvider provider) {
         wetness = assertRange(provider, 0F, 2F, "wetness");
         return this;

@@ -3,15 +3,9 @@ package io.github.notenoughmail.worldjs.builders.base;
 import com.google.gson.JsonElement;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.typings.Info;
-import dev.latvian.mods.kubejs.util.Lazy;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
-import dev.latvian.mods.rhino.Context;
-import dev.latvian.mods.rhino.NativeJavaObject;
-import dev.latvian.mods.rhino.Scriptable;
-import dev.latvian.mods.rhino.type.TypeInfo;
-import dev.latvian.mods.rhino.util.CustomJavaToJsWrapper;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
+import io.github.notenoughmail.worldjs.util.PlacementModifiers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +16,6 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -62,8 +55,8 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
     }
 
     @Info("Add placement modifiers")
-    public PlacedFeatureBuilder modifiers(Consumer<Modifiers> modifiers) {
-        Modifiers.accept(this::modifier, modifiers);
+    public PlacedFeatureBuilder modifiers(Consumer<PlacementModifiers> modifiers) {
+        PlacementModifiers.accept(this::modifier, modifiers);
         return this;
     }
 
@@ -76,36 +69,5 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
                 ),
                 modifiers
         );
-    }
-
-    public enum Modifiers implements CustomJavaToJsWrapper {
-        INSTANCE;
-
-        public static Consumer<PlacementModifier> modifierRet;
-
-        public static final Lazy<Map<String, PlacedFeatureModifierEvent.ModifierNamespace>> NAMESPACES = Lazy.of(PlacedFeatureModifierEvent::createNamespaces);
-
-        public static void accept(Consumer<PlacementModifier> ret, Consumer<Modifiers> source) {
-            modifierRet = ret;
-            source.accept(INSTANCE);
-            modifierRet = null;
-        }
-
-        public static void accept(PlacementModifier mod) {
-            if (modifierRet != null) modifierRet.accept(mod);
-        }
-
-        @Override
-        public Scriptable convertJavaToJs(Context cx, Scriptable scope, TypeInfo staticType) {
-            return new NativeJavaObject(scope, this, staticType, cx) {
-
-                @Override
-                public Object get(Context cx, String name, Scriptable start) {
-                    final PlacedFeatureModifierEvent.ModifierNamespace namespace = NAMESPACES.get().get(name);
-                    if (namespace != null) return namespace;
-                    return super.get(cx, name, start);
-                }
-            };
-        }
     }
 }

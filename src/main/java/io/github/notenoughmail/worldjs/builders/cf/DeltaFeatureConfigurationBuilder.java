@@ -50,8 +50,8 @@ public class DeltaFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<D
         return new DeltaFeatureConfiguration(
                 contents,
                 rim,
-                size,
-                rimSize
+                notNull(size, "size"),
+                notNull(rimSize, "rimSize")
         );
     }
 

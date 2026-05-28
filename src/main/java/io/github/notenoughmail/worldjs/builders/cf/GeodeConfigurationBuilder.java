@@ -4,10 +4,12 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GeodeBlockSettings;
 import net.minecraft.world.level.levelgen.GeodeCrackSettings;
@@ -17,24 +19,19 @@ import net.minecraft.world.level.levelgen.feature.configurations.GeodeConfigurat
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 @ReturnsSelf
 public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeConfiguration> {
 
     public transient double usePotentialPlacementsChance,
             useAlternativeLayer0Chance,
-            noiseMultiplier,
-            layerFilling,
-            layerInnerLayer,
-            layerMiddleLayer,
-            layerOuterLayer,
-            crackGenerateCrackChance,
-            crackBaseCrackSize;
+            noiseMultiplier;
     public transient boolean placementsRequireLayer0Alternative;
-    public transient int minGenOffset, maxGenOffset, invalidBlocksThreshold, crackCrackPointOffset;
+    public transient int minGenOffset, maxGenOffset, invalidBlocksThreshold;
     public transient IntProvider outWallDistance, distributionPoints, pointOffset;
-    public transient GeodeBlockSettings blocks;
+    public transient GeodeBlocks blocks;
+    public transient GeodeLayers layers;
+    public transient GeodeCrack crack;
 
     public GeodeConfigurationBuilder(ResourceLocation id) {
         super(id);
@@ -44,33 +41,41 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
         placementsRequireLayer0Alternative = true;
         minGenOffset = -16;
         maxGenOffset = 16;
-        layerFilling = 1.7D;
-        layerInnerLayer = 2.2D;
-        layerMiddleLayer = 3.2D;
-        layerOuterLayer = 4.2D;
-        crackGenerateCrackChance = 1.0D;
-        crackBaseCrackSize = 2.0D;
-        crackCrackPointOffset = 2;
+        blocks = GeodeBlocks.DEFAULT;
+        layers = GeodeLayers.DEFAULT;
+        crack = GeodeCrack.DEFAULT;
         outWallDistance = UniformInt.of(4, 5);
         distributionPoints = UniformInt.of(3, 4);
         pointOffset = UniformInt.of(1, 2);
     }
 
     @Info("The blocks used for the geode")
-    public GeodeConfigurationBuilder blocks(Blocks blocks) {
-        this.blocks = blocks.build();
+    public GeodeConfigurationBuilder blocks(GeodeBlocks blocks) {
+        notEmpty(blocks.innerPlacements(), "blocks.innerPlacements");
+        this.blocks = blocks;
         return this;
     }
 
+    private void assertLayer(double d, String name) {
+        assertRange(d, 0.01D, 50D, "layers." + name);
+    }
+
     @Info("The thickness of each layer")
-    public GeodeConfigurationBuilder layers(Consumer<Layer> layer) {
-        layer.accept(new Layer());
+    public GeodeConfigurationBuilder layers(GeodeLayers layers) {
+        assertLayer(layers.filling(), "filling");
+        assertLayer(layers.innerLayer(), "innerLayer");
+        assertLayer(layers.middleLayer(), "middleLayer");
+        assertLayer(layers.outerLayer(), "outerLayer");
+        this.layers = layers;
         return this;
     }
 
     @Info("The crack properties")
-    public GeodeConfigurationBuilder crack(Consumer<Crack> crack) {
-        crack.accept(new Crack());
+    public GeodeConfigurationBuilder crack(GeodeCrack crack) {
+        assertUnit(crack.generateChance(), "crack.generateChance");
+        assertRange(crack.baseSize(), 0D, 5D, "crack.baseSize");
+        assertRange(crack.pointOffset(), 0, 10, "crack.pointOffset");
+        this.crack = crack;
         return this;
     }
 
@@ -131,18 +136,9 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
     @Override
     protected GeodeConfiguration createFeatureConfiguration() {
         return new GeodeConfiguration(
-                notNull(blocks, "blocks"),
-                new GeodeLayerSettings(
-                        layerFilling,
-                        layerInnerLayer,
-                        layerMiddleLayer,
-                        layerOuterLayer
-                ),
-                new GeodeCrackSettings(
-                        crackGenerateCrackChance,
-                        crackBaseCrackSize,
-                        crackCrackPointOffset
-                ),
+                blocks.build(),
+                layers.build(),
+                crack.build(),
                 usePotentialPlacementsChance,
                 useAlternativeLayer0Chance,
                 placementsRequireLayer0Alternative,
@@ -161,69 +157,17 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
         return Feature.GEODE;
     }
 
-    public class Crack {
-
-        @Info("The probability of generating a crack, in the range [0, 1]. Defaults to 1")
-        public Crack generateCrackChance(double chance) {
-            crackGenerateCrackChance = assertUnit(chance, "generateCrackChance");
-            return this;
-        }
-
-        @Info("The base size of the crack, in the range [0, 5]. Defaults to 2")
-        public Crack baseCrackSize(double size) {
-            crackBaseCrackSize = assertRange(size, 0D, 5D, "baseCrackSize");
-            return this;
-        }
-
-        @Info("The offset applied to the crack, in the range [0, 10]. Defaults to 2")
-        public Crack crackPointOffset(int offset) {
-            crackCrackPointOffset = assertRange(offset, 0, 10, "crackPointOffset");
-            return this;
-        }
-    }
-
-    public class Layer {
-
-        @Info("The filling thickness, in the range [0.01, 50]. Defaults to 1.7")
-        public Layer filling(double filling) {
-            layerFilling = f(filling, "filling");
-            return this;
-        }
-
-        @Info("The inner layer thickness, in the range [0.01, 50]. Defaults to 2.2")
-        public Layer innerLayer(double layer) {
-            layerInnerLayer = f(layer, "innerLayer");
-            return this;
-        }
-
-        @Info("The middle layer thickness, in the range [0.01, 50]. Defaults to 3.2")
-        public Layer middleLayer(double layer) {
-            layerMiddleLayer = f(layer, "middleLayer");
-            return this;
-        }
-
-        @Info("The outer layer thickness, in the range [0.01, 50]. Defaults to 4.2")
-        public Layer outerLayer(double layer) {
-            layerOuterLayer = f(layer, "outerLayer");
-            return this;
-        }
-
-        private static double f(double val, String name) {
-            return assertRange(val, 0.01D, 50D, name);
-        }
-    }
-
-    public record Blocks(
+    public record GeodeBlocks(
             @Info("The blocks of the 'filling' layer, air by default")
-            BlockStateProvider fillingProvider,
+            BlockStateProvider filling,
             @Info("The blocks of the inner layer, amethyst by default")
-            BlockStateProvider innerLayerProvider,
+            BlockStateProvider innerLayer,
             @Info("The alternative blocks of the inner layer, budding amethyst by default")
-            BlockStateProvider alternativeInnerLayerProvider,
+            BlockStateProvider alternativeInnerLayer,
             @Info("The blocks of the middle layer, calcite by default")
-            BlockStateProvider middleLayerProvider,
+            BlockStateProvider middleLayer,
             @Info("The blocks of the outer layer, smooth basalt by default")
-            BlockStateProvider outerLayerProvider,
+            BlockStateProvider outerLayer,
             @Info("The blocks to place adjacent to the alternative inner layer blocks, amethyst buds and clusters by default")
             List<BlockState> innerPlacements,
             @Info("The blocks that the geode cannot replace, defaults to `minecraft:features_cannot_replace`")
@@ -231,17 +175,73 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
             @Info("Blocks which the geode considers invalid. Is not respected due to MC-264886. Defaults to `minecraft:geode_invalid_blocks`")
             TagKey<Block> invalidBlocks
     ) {
+        public static final GeodeBlocks DEFAULT = new GeodeBlocks(
+                BlockStateProvider.simple(Blocks.AIR),
+                BlockStateProvider.simple(Blocks.AMETHYST_BLOCK),
+                BlockStateProvider.simple(Blocks.BUDDING_AMETHYST),
+                BlockStateProvider.simple(Blocks.CALCITE),
+                BlockStateProvider.simple(Blocks.SMOOTH_BASALT),
+                List.of(
+                        Blocks.SMALL_AMETHYST_BUD.defaultBlockState(),
+                        Blocks.MEDIUM_AMETHYST_BUD.defaultBlockState(),
+                        Blocks.LARGE_AMETHYST_BUD.defaultBlockState(),
+                        Blocks.AMETHYST_CLUSTER.defaultBlockState()
+                ),
+                BlockTags.FEATURES_CANNOT_REPLACE,
+                BlockTags.GEODE_INVALID_BLOCKS
+        );
+
         GeodeBlockSettings build() {
-            if (innerPlacements.isEmpty()) throw new IllegalArgumentException("Must have at least one inner placement!");
             return new GeodeBlockSettings(
-                    fillingProvider,
-                    innerLayerProvider,
-                    alternativeInnerLayerProvider,
-                    middleLayerProvider,
-                    outerLayerProvider,
+                    filling,
+                    innerLayer,
+                    alternativeInnerLayer,
+                    middleLayer,
+                    outerLayer,
                     innerPlacements,
                     cannotReplace,
                     invalidBlocks
+            );
+        }
+    }
+
+    public record GeodeLayers(
+            @Info("The filling thickness, in the range [0.01, 50]")
+            double filling,
+            @Info("The inner layer thickness, in the range [0.01, 50]")
+            double innerLayer,
+            @Info("The middles later thickness, in the range [0.01, 50]")
+            double middleLayer,
+            @Info("Theouter layer thickness, in the range [0.01, 50] ")
+            double outerLayer
+    ) {
+        public static final GeodeLayers DEFAULT = new GeodeLayers(1.7D, 2.2D, 3.2D, 4.2D);
+
+        GeodeLayerSettings build() {
+            return new GeodeLayerSettings(
+                    filling,
+                    innerLayer,
+                    middleLayer,
+                    outerLayer
+            );
+        }
+    }
+
+    public record GeodeCrack(
+            @Info("The probability of generating a crack, in the range [0, 1]")
+            double generateChance,
+            @Info("The base size of the crack, in the range [0, 5]")
+            double baseSize,
+            @Info("The offset applied to the crack, in the range [0, 10]")
+            int pointOffset
+    ) {
+        public static final GeodeCrack DEFAULT = new GeodeCrack(1.0D, 2.0D, 2);
+
+        GeodeCrackSettings build() {
+            return new GeodeCrackSettings(
+                    generateChance,
+                    baseSize,
+                    pointOffset
             );
         }
     }

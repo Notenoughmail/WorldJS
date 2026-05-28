@@ -54,13 +54,13 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
         return this;
     }
 
-    @Info("The block to use for the root column")
+    @Info("The block to use for the root blob")
     public RootSystemConfigurationBuilder rootStateProvider(BlockStateProvider provider) {
         rootStateProvider = provider;
         return this;
     }
 
-    @Info("The number of times to try to place the roots, in the range [1, 256]")
+    @Info("The number of times to try to place the root blocks, in the range [1, 256]")
     public RootSystemConfigurationBuilder rootPlacementAttempts(int attempts) {
         rootPlacementAttempts = assertRange(attempts, 1, 256, "rootPlacementAttempts");
         return this;
@@ -84,7 +84,7 @@ public class RootSystemConfigurationBuilder extends ConfiguredFeatureBuilder<Roo
         return this;
     }
 
-    @Info("The block to use hanging below the root column")
+    @Info("The block to use for blocks which hang below the main root blob")
     public RootSystemConfigurationBuilder hangingRootStateProvider(BlockStateProvider provider) {
         hangingRootStateProvider = provider;
         return this;

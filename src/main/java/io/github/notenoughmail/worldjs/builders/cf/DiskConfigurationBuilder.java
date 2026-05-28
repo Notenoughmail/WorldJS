@@ -36,7 +36,7 @@ public class DiskConfigurationBuilder extends ConfiguredFeatureBuilder<DiskConfi
             value = "The block to place, depending on rules and with a fallback value",
             params = {
                     @Param(name = "fallback", value = "The bloc kto place if no rules pass"),
-                    @Param(name = "rules", value = "The rules for what bloc kto place")
+                    @Param(name = "rules", value = "The rules for what block to place")
             }
     )
     public DiskConfigurationBuilder stateProvider(BlockStateProvider fallback, List<RuleBasedBlockStateProvider.Rule> rules) {

@@ -32,7 +32,7 @@ public class RandomFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<
                     @Param(name = "chance", value = "The chance of the feature being chosen, in the range [0, 1]")
             }
     )
-    public RandomFeatureConfigurationBuilder addFeature(Holder.Reference<PlacedFeature> feature, float chance) {
+    public RandomFeatureConfigurationBuilder withFeature(Holder.Reference<PlacedFeature> feature, float chance) {
         features.add(new WeightedPlacedFeature(
                 feature,
                 assertUnit(chance, "chance")

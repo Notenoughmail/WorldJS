@@ -21,7 +21,10 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @ReturnsSelf
 public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> extends BuilderBase<ConfiguredFeature<FC, Feature<FC>>> {
@@ -130,7 +133,7 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
 
     @Info("Create and modify the placed feature of the configured feature")
     public ConfiguredFeatureBuilder<FC> withPlacement(Context ctx, Consumer<PlacedFeatureBuilder> builder) {
-        return withPlacement(ctx, KubeResourceLocation.wrap(id), builder);
+        return placement(ctx, id, builder);
     }
 
     @Info(
@@ -138,7 +141,11 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
             params = @Param(name = "id", value = "The id the placed feature will be create with")
     )
     public ConfiguredFeatureBuilder<FC> withPlacement(Context ctx, KubeResourceLocation id, Consumer<PlacedFeatureBuilder> builder) {
-        placedFeature = new PlacedFeatureBuilder(id.wrapped());
+        return placement(ctx, id.wrapped(), builder);
+    }
+
+    protected ConfiguredFeatureBuilder<FC> placement(Context ctx, ResourceLocation id, Consumer<PlacedFeatureBuilder> builder) {
+        placedFeature = new PlacedFeatureBuilder(id);
         placedFeature.sourceLine = SourceLine.of(ctx);
         builder.accept(placedFeature);
         placedFeature.configuredFeature(this);

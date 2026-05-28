@@ -21,7 +21,7 @@ public class LayerConfigurationBuilder extends ConfiguredFeatureBuilder<LayerCon
         state = Blocks.AIR.defaultBlockState();
     }
 
-    @Info("The layer to fill, in the range [0, 4064]")
+    @Info("The height to fill, in the range [0, 4064]")
     public LayerConfigurationBuilder height(int height) {
         this.height = assertRange(height, 0, DimensionType.Y_SIZE, "height");
         return this;
@@ -36,7 +36,7 @@ public class LayerConfigurationBuilder extends ConfiguredFeatureBuilder<LayerCon
     @Override
     protected LayerConfiguration createFeatureConfiguration() {
         return new LayerConfiguration(
-                height,
+                notNull(height, "height"),
                 state
         );
     }

@@ -18,6 +18,7 @@ public class HugeFungusConfigurationBuilder extends ConfiguredFeatureBuilder<Hug
 
     public HugeFungusConfigurationBuilder(ResourceLocation id) {
         super(id);
+        replaceableBlocks = BlockPredicate.alwaysTrue();
     }
 
     @Info("The block to place the feature on")
@@ -38,7 +39,7 @@ public class HugeFungusConfigurationBuilder extends ConfiguredFeatureBuilder<Hug
         return this;
     }
 
-    @Info("The bloc kto use as decoration")
+    @Info("The block to use as decoration")
     public HugeFungusConfigurationBuilder decorState(BlockState state) {
         decorState = state;
         return this;
@@ -63,7 +64,7 @@ public class HugeFungusConfigurationBuilder extends ConfiguredFeatureBuilder<Hug
                 notNull(stemState, "stemState"),
                 notNull(hatState, "hatState"),
                 notNull(decorState, "decorState"),
-                notNull(replaceableBlocks, "replaceableBlocks"),
+                replaceableBlocks,
                 planted
         );
     }

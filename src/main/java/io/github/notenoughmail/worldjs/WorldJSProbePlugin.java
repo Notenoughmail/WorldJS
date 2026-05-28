@@ -2,12 +2,10 @@ package io.github.notenoughmail.worldjs;
 
 import com.google.gson.JsonObject;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import io.github.notenoughmail.worldjs.util.Args;
-import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent.ModifierFunction;
-import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent.ModifierFunctions;
-import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent.ModifierNamespace;
-import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.PlacementModifiers;
 import io.github.notenoughmail.worldjs.util.WeightedValue;
+import io.github.notenoughmail.worldjs.util.synmethod.Args;
+import io.github.notenoughmail.worldjs.util.synmethod.MethodNamespace;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.plugin.builtins.alias.RecordTypes;
 import moe.wolfgirl.probejs.typescript.ClassPath;
@@ -28,6 +26,7 @@ import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.material.Fluid;
 
@@ -47,7 +46,7 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
     public Set<Class<?>> provideClassForDiscovery() {
         return Set.of(
                 WeightedValue.class,
-                PlacedFeatureBuilder.Modifiers.class,
+                PlacementModifiers.class,
                 HeightProvider.class,
                 BlockPredicate.class,
                 OreConfiguration.TargetBlockState.class,
@@ -58,14 +57,14 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(Documents.ClassAccessor classDocuments) {
-        final Map<String, ModifierNamespace> modifiers = PlacedFeatureBuilder.Modifiers.NAMESPACES.get();
-        final ClassPath modifiersClazz = path(PlacedFeatureBuilder.Modifiers.class);
+        final Map<String, MethodNamespace<PlacementModifier>> modifiers = PlacementModifiers.NAMESPACES.get();
+        final ClassPath modifiersClazz = path(PlacementModifiers.class);
         final ClassBuilder builder = Members.clazz(modifiersClazz);
         classDocuments.removeClassDocument(modifiersClazz, null);
 
-        for (Map.Entry<String, ModifierNamespace> entry : modifiers.entrySet()) {
+        for (Map.Entry<String, MethodNamespace<PlacementModifier>> entry : modifiers.entrySet()) {
             final String name = entry.getKey();
-            final ModifierNamespace namespace = entry.getValue();
+            final MethodNamespace<PlacementModifier> namespace = entry.getValue();
             final Namespace member = new Namespace(name);
             namespace(classDocuments.converter, member::method, namespace);
             builder.member(member);
@@ -74,18 +73,18 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
         classDocuments.addClassDocument(modifiersClazz, builder.build());
     }
 
-    private static void namespace(TypeConverter converter, Consumer<MethodDecl> methods, ModifierNamespace namespace) {
-        for (Map.Entry<String, ModifierFunctions> entry : namespace.functions.entrySet()) {
+    private static void namespace(TypeConverter converter, Consumer<MethodDecl> methods, MethodNamespace<PlacementModifier> namespace) {
+        for (Map.Entry<String, MethodNamespace.Functions<PlacementModifier>> entry : namespace.functions.entrySet()) {
             final String name = entry.getKey();
-            final ModifierFunctions functions = entry.getValue();
+            final MethodNamespace.Functions<PlacementModifier> functions = entry.getValue();
 
-            for (ModifierFunction func : functions.functions.values()) {
+            for (MethodNamespace.Function<PlacementModifier> func : functions.functions.values()) {
                 methods.accept(buildMethod(converter, func, name));
             }
         }
     }
 
-    private static MethodDecl buildMethod(TypeConverter converter, ModifierFunction func, String name) {
+    private static MethodDecl buildMethod(TypeConverter converter, MethodNamespace.Function<PlacementModifier> func, String name) {
         final MethodBuilder builder = Members.method(name);
         builder.returnType(Types.THIS);
 

@@ -17,8 +17,6 @@ import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -36,7 +34,6 @@ import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -79,7 +76,6 @@ public class WorldJSPlugin implements KubeJSPlugin {
             cf(c, "block_column", BlockColumnConfigurationBuilder.class, BlockColumnConfigurationBuilder::new);
             cf(c, "vegetation_patch", VegetationPatchConfigurationBuilder.class, Feature.VEGETATION_PATCH, VegetationPatchConfigurationBuilder::new);
             cf(c, "waterlogged_vegetation_patch", VegetationPatchConfigurationBuilder.class, Feature.WATERLOGGED_VEGETATION_PATCH, VegetationPatchConfigurationBuilder::new);
-            // Doc cutoff
             cf(c, "root_system", RootSystemConfigurationBuilder.class, RootSystemConfigurationBuilder::new);
             cf(c, "multiface_growth", MultifaceGrowthConfigurationBuilder.class, MultifaceGrowthConfigurationBuilder::new);
             cf(c, "underwater_magma", UnderwaterMagmaConfigurationBuilder.class, UnderwaterMagmaConfigurationBuilder::new);
@@ -163,21 +159,9 @@ public class WorldJSPlugin implements KubeJSPlugin {
     @Override
     public void registerRecordDefaults(RecordDefaultsRegistry registry) {
         registry.register(new AddSpawnsBiomeModifierBuilder.Spawn(null, 1, 0, 1));
-        registry.register(new GeodeConfigurationBuilder.Blocks(
-                BlockStateProvider.simple(Blocks.AIR),
-                BlockStateProvider.simple(Blocks.AMETHYST_BLOCK),
-                BlockStateProvider.simple(Blocks.BUDDING_AMETHYST),
-                BlockStateProvider.simple(Blocks.CALCITE),
-                BlockStateProvider.simple(Blocks.SMOOTH_BASALT),
-                List.of(
-                        Blocks.SMALL_AMETHYST_BUD.defaultBlockState(),
-                        Blocks.MEDIUM_AMETHYST_BUD.defaultBlockState(),
-                        Blocks.LARGE_AMETHYST_BUD.defaultBlockState(),
-                        Blocks.AMETHYST_CLUSTER.defaultBlockState()
-                ),
-                BlockTags.FEATURES_CANNOT_REPLACE,
-                BlockTags.GEODE_INVALID_BLOCKS
-        ));
+        registry.register(GeodeConfigurationBuilder.GeodeBlocks.DEFAULT);
+        registry.register(GeodeConfigurationBuilder.GeodeLayers.DEFAULT);
+        registry.register(GeodeConfigurationBuilder.GeodeCrack.DEFAULT);
     }
 
     @Override

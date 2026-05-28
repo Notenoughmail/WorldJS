@@ -46,19 +46,19 @@ public class LargeDripstoneConfigurationBuilder extends ConfiguredFeatureBuilder
         return this;
     }
 
-    @Info("The maximum ratio between the column radius and cave height, in the range [0, 1]")
+    @Info("The maximum ratio between the column radius and cave height, in the range [0.1, 1]")
     public LargeDripstoneConfigurationBuilder maxColumnRadiusToCaveHeightRatio(float ratio) {
         maxColumnRadiusToCaveHeightRatio = assertRange(ratio, 0.1F, 1F, "maxColumnRadiusToCaveHeightRatio");
         return this;
     }
 
-    @Info("The bluntness/truncation of stalactites, higher values leads to shorter height. In the range [0, 10]")
+    @Info("The bluntness/truncation of stalactites, higher values leads to shorter height. In the range [0.1, 10]")
     public LargeDripstoneConfigurationBuilder stalactiteBluntness(FloatProvider provider) {
         stalactiteBluntness = assertRange(provider, 0.1F, 10F, "stalactiteBluntness");
         return this;
     }
 
-    @Info("The bluntness/truncation of stalagmites, higher values leads to shorter height. In the range [0, 10]")
+    @Info("The bluntness/truncation of stalagmites, higher values leads to shorter height. In the range [0.1, 10]")
     public LargeDripstoneConfigurationBuilder stalagmiteBluntness(FloatProvider provider) {
         stalagmiteBluntness = assertRange(provider, 0.1F, 10F, "stalagmiteBluntness");
         return this;

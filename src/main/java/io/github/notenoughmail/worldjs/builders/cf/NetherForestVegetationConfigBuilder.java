@@ -10,7 +10,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVeg
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 @ReturnsSelf
-public class    NetherForestVegetationConfigBuilder extends ConfiguredFeatureBuilder<NetherForestVegetationConfig> {
+public class NetherForestVegetationConfigBuilder extends ConfiguredFeatureBuilder<NetherForestVegetationConfig> {
 
     public transient BlockStateProvider provider;
     public transient int width, height;
