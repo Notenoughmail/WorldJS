@@ -9,7 +9,7 @@ issueTrackerURL="https://github.com/Notenoughmail/WorldJS/issues"
     version="${mod_version}"
     displayName="${mod_name}"
     displayURL="https://notenoughmail.github.io/worldjs/"
-    #logoFile="examplemod.png"
+    logoFile="worldjs.png"
     #credits=""
     authors="NotEnoughMail"
 
@@ -34,5 +34,12 @@ Easy creation of a number of worldgen features using KubeJS
     modId="minecraft"
     type="required"
     versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="kubejs"
+    type="required"
+    versionrange="[${kubejs_version},)"
     ordering="NONE"
     side="BOTH"
