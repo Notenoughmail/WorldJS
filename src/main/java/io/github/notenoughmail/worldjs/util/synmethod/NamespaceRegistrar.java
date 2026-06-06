@@ -44,7 +44,7 @@ public interface NamespaceRegistrar<R> {
     NamespaceRegistrar<R> register(
             String name,
             Args arguments,
-            Method<Object[], R> method,
+            Method<Object[], ? extends R> method,
             String functionDescription
     );
 
@@ -75,7 +75,7 @@ public interface NamespaceRegistrar<R> {
      */
     default NamespaceRegistrar<R> unit(
             String name,
-            Supplier<R> unit,
+            Supplier<? extends R> unit,
             String functionDescription
     ) {
         return register(
@@ -97,7 +97,7 @@ public interface NamespaceRegistrar<R> {
     default <T> NamespaceRegistrar<R> registerSingleArg(
             String name,
             Args.Arg argument,
-            Method<T, R> method,
+            Method<T, ? extends R> method,
             String functionDescription
     ) {
         return register(
@@ -123,7 +123,7 @@ public interface NamespaceRegistrar<R> {
             String argumentName,
             TypeInfo argumentType,
             String argumentDescription,
-            Method<T, R> method,
+            Method<T, ? extends R> method,
             String functionDescription
     ) {
         return registerSingleArg(
@@ -149,7 +149,7 @@ public interface NamespaceRegistrar<R> {
             String argumentName,
             Class<T> argumentType,
             String argumentDescription,
-            Method<T, R> method,
+            Method<T, ? extends R> method,
             String functionDescription
     ) {
         return registerSingleArg(

@@ -308,9 +308,9 @@ public class WorldJS {
                 )
         ;
 
-        if (!FMLEnvironment.production) {
-            mc.printAll();
-        }
+        // if (!FMLEnvironment.production) {
+        //     mc.printAll();
+        // }
     }
 
     private static IntProvider intProvider(Object o) {

@@ -303,7 +303,9 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
         @Override
         public Set<ClassPath> getImports() {
             Set<ClassPath> imports = new HashSet<>();
-            for (MethodDecl method : methods) imports.addAll(method.getImports());
+            for (MethodDecl method : methods) {
+                imports.addAll(method.getImports());
+            }
             return imports;
         }
 
@@ -316,6 +318,14 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             }
             lines.add(" ".repeat(indent) + "}");
             return lines;
+        }
+
+        @Override
+        public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+            super.setResolvedSymbols(resolvedSymbols);
+            for (MethodDecl method : methods) {
+                method.setResolvedSymbols(resolvedSymbols);
+            }
         }
     }
 }

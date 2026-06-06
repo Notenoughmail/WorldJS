@@ -13,6 +13,7 @@ import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.bm.*;
 import io.github.notenoughmail.worldjs.builders.cf.*;
+import io.github.notenoughmail.worldjs.types.features.KubeFeature;
 import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
@@ -43,6 +44,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
     @Override
     public void registerBuilderTypes(BuilderTypeRegistry registry) {
         registry.addDefault(Registries.PLACED_FEATURE, PlacedFeatureBuilder.class, PlacedFeatureBuilder::new);
+        registry.addDefault(Registries.FEATURE, KubeFeature.Builder.class, KubeFeature.Builder::new);
         registry.of(Registries.CONFIGURED_FEATURE, c -> {
             cf(c, "no_op", Feature.NO_OP);
             cf(c, "chorus_plant", Feature.CHORUS_PLANT);

@@ -43,7 +43,7 @@ public class MethodNamespace<R> extends BaseFunction implements NamespaceRegistr
     public NamespaceRegistrar<R> register(
             String name,
             Args arguments,
-            Method<Object[], R> method,
+            Method<Object[], ? extends R> method,
             String functionDescription
     ) {
         final Functions<R> functions = this.functions.computeIfAbsent(name, n -> new Functions<>(n, this));
@@ -87,7 +87,7 @@ public class MethodNamespace<R> extends BaseFunction implements NamespaceRegistr
         }
     }
 
-    public record Function<T>(Args args, Method<Object[], T> method, String probeDesc) {
+    public record Function<T>(Args args, Method<Object[], ? extends T> method, String probeDesc) {
 
         T call(Object[] casted) {
             return method.invoke(casted);
