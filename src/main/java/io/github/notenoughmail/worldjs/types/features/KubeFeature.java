@@ -5,6 +5,8 @@ import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.registry.BuilderType;
 import dev.latvian.mods.kubejs.registry.BuilderTypeRegistryHandler;
 import dev.latvian.mods.kubejs.util.Cast;
+import dev.latvian.mods.rhino.util.HideFromJS;
+import io.github.notenoughmail.worldjs.WorldJS;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import io.github.notenoughmail.worldjs.util.mixin.InfoAccessor;
 import net.minecraft.core.BlockPos;
@@ -35,7 +37,7 @@ public class KubeFeature extends Feature<NoneFeatureConfiguration> {
 
     @Override
     public boolean place(NoneFeatureConfiguration config, WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
-        return level.ensureCanWrite(origin) && placeFunction.place(level, chunkGenerator, random, origin);
+        return level.ensureCanWrite(origin) && placeFunction.placeSafe(level, chunkGenerator, random, origin);
     }
 
     @FunctionalInterface
@@ -47,6 +49,21 @@ public class KubeFeature extends Feature<NoneFeatureConfiguration> {
                 RandomSource random,
                 BlockPos origin
         );
+
+        @HideFromJS
+        default boolean placeSafe(
+                WorldGenLevel level,
+                ChunkGenerator chunkGenerator,
+                RandomSource random,
+                BlockPos origin
+        ) {
+            try {
+                return place(level, chunkGenerator, random, origin);
+            } catch (Exception e) {
+                WorldJS.scriptErrorOnce("Error encountered while placing feature", e);
+                return false;
+            }
+        }
     }
 
     public static class Builder extends BuilderBase<KubeFeature> {

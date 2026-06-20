@@ -1,6 +1,7 @@
 package io.github.notenoughmail.worldjs;
 
 import com.mojang.logging.LogUtils;
+import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.util.Cast;
 import io.github.notenoughmail.worldjs.types.features.WeightedRandomSelectorFeature;
 import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
@@ -23,6 +24,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static io.github.notenoughmail.worldjs.util.Types.*;
 
 @Mod(WorldJS.MODID)
@@ -33,6 +37,15 @@ public class WorldJS {
 
     public static ResourceLocation identifier(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    }
+
+    private static final Set<Throwable> THROWN = new HashSet<>();
+
+    public static void scriptErrorOnce(String msg, Throwable t) {
+        if (!THROWN.contains(t)) {
+            THROWN.add(t);
+            ConsoleJS.SERVER.error(msg, t);
+        }
     }
 
     private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, MODID);

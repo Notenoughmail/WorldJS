@@ -56,6 +56,11 @@ public class MethodNamespace<R> extends BaseFunction implements NamespaceRegistr
         return functions.entrySet();
     }
 
+    @Override
+    public String getFunctionName() {
+        return namespace;
+    }
+
     public static class Functions<R> extends BaseFunction {
 
         private final MethodNamespace<R> parent;
@@ -84,6 +89,11 @@ public class MethodNamespace<R> extends BaseFunction implements NamespaceRegistr
                 }
             }
             throw Context.reportRuntimeError("No function '%s' with %s params found".formatted(name, argLength), ctx);
+        }
+
+        @Override
+        public String getFunctionName() {
+            return name + " (in '" + parent.getFunctionName() + "')";
         }
     }
 

@@ -1,30 +1,34 @@
 package io.github.notenoughmail.worldjs.util;
 
 import dev.latvian.mods.rhino.Context;
-import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.Scriptable;
-import dev.latvian.mods.rhino.type.TypeInfo;
-import dev.latvian.mods.rhino.util.CustomJavaToJsWrapper;
+import dev.latvian.mods.rhino.Undefined;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import io.github.notenoughmail.worldjs.util.synmethod.MethodNamespace;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 @HideFromJS
-public interface NamespacedScriptable<T> extends CustomJavaToJsWrapper {
+public interface NamespacedScriptable<T> extends ImmutableSingleInstanceScriptable {
 
-    @Nullable
-    MethodNamespace<T> getNamespace(String name);
+    Map<String, MethodNamespace<T>> namespaces();
 
     @Override
-    default Scriptable convertJavaToJs(Context cx, Scriptable scope, TypeInfo staticType) {
-        return new NativeJavaObject(scope, this, staticType, cx) {
+    default Object[] getIds(Context cx) {
+        return namespaces().keySet().toArray();
+    }
 
-            @Override
-            public Object get(Context cx, String name, Scriptable start) {
-                final MethodNamespace<T> namespace = getNamespace(name);
-                if (namespace != null) return namespace;
-                return super.get(cx, name, start);
-            }
-        };
+    @Override
+    default Object get(Context cx, String name, Scriptable start) {
+        final MethodNamespace<T> namespace = namespaces().get(name);
+        if (namespace == null) {
+            return Undefined.INSTANCE;
+        }
+        return namespace;
+    }
+
+    @Override
+    default boolean has(Context cx, String name, Scriptable start) {
+        return namespaces().containsKey(name);
     }
 }
