@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs;
 import com.google.gson.JsonObject;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import io.github.notenoughmail.worldjs.util.PlacementModifiers;
+import io.github.notenoughmail.worldjs.util.ServerRegistryHolderSet;
 import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.synmethod.Args;
 import io.github.notenoughmail.worldjs.util.synmethod.MethodNamespace;
@@ -21,6 +22,7 @@ import moe.wolfgirl.probejs.typescript.document.builders.MethodBuilder;
 import moe.wolfgirl.probejs.typescript.document.members.MethodDecl;
 import moe.wolfgirl.probejs.typescript.document.types.special.ObjectType;
 import moe.wolfgirl.probejs.typescript.transpiler.TypeConverter;
+import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
@@ -269,6 +271,8 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             obj(r, clazz, "inside_world", off::apply);
             obj(r, clazz, "unobstructed", off::apply);
         }
+
+        r.addInputAlias(ServerRegistryHolderSet.class, HolderSet.class);
     }
 
     private static Type literal(String str) {

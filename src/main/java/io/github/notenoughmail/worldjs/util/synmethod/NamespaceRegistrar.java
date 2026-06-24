@@ -189,7 +189,7 @@ public interface NamespaceRegistrar<R> {
                     final Iterator<Args.Arg> iterator = func.args().args().iterator();
                     while (iterator.hasNext()) {
                         final Args.Arg arg = iterator.next();
-                        builder.append(arg.name()).append(":").append(PRINT_CTX.toString(arg.type()));
+                        builder.append(arg.name()).append(": ").append(PRINT_CTX.toString(arg.type()));
                         if (iterator.hasNext()) {
                             builder.append(", ");
                         }

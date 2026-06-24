@@ -14,6 +14,7 @@ import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.bm.*;
 import io.github.notenoughmail.worldjs.builders.cf.*;
 import io.github.notenoughmail.worldjs.types.features.KubeFeature;
+import io.github.notenoughmail.worldjs.util.ServerRegistryHolderSet;
 import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
@@ -150,6 +151,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
         registry.register(VerticalAnchor.class, Wrappers::verticalAnchor);
         registry.register(HeightProvider.class, Wrappers::heightProvider);
         registry.register(BlockPredicate.class, Wrappers::blockPredicate);
+        registry.register(ServerRegistryHolderSet.class, ServerRegistryHolderSet::wrap);
         registry.registerCodec(TrunkPlacer.class, TrunkPlacer.CODEC);
         registry.registerCodec(FoliagePlacer.class, FoliagePlacer.CODEC);
         registry.registerCodec(RootPlacer.class, RootPlacer.CODEC);

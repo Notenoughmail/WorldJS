@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.bm;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeModifierBuilder;
+import io.github.notenoughmail.worldjs.util.ServerRegistryHolderSet;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -28,8 +29,10 @@ public class AddFeaturesBiomeModifierBuilder extends BiomeModifierBuilder<BiomeM
     }
 
     @Info("The feature(s) to add to the biome(s)")
-    public AddFeaturesBiomeModifierBuilder features(HolderSet<PlacedFeature> features) {
-        this.features = features;
+    public AddFeaturesBiomeModifierBuilder features(ServerRegistryHolderSet<PlacedFeature> features) {
+        this.features = features.verify(() -> {
+            throw err("'features' should not be empty");
+        });
         return this;
     }
 

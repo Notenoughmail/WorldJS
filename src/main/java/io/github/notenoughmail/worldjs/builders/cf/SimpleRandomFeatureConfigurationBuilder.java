@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.ServerRegistryHolderSet;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -19,8 +20,10 @@ public class SimpleRandomFeatureConfigurationBuilder extends ConfiguredFeatureBu
     }
 
     @Info("The placed features to randomly select from to place")
-    public SimpleRandomFeatureConfigurationBuilder features(HolderSet<PlacedFeature> features) {
-        this.features = features;
+    public SimpleRandomFeatureConfigurationBuilder features(ServerRegistryHolderSet<PlacedFeature> features) {
+        this.features = features.verify(() -> {
+            throw exception("'features' should not be empty");
+        });
         return this;
     }
 
