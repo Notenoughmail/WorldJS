@@ -1,6 +1,5 @@
 package io.github.notenoughmail.worldjs.util;
 
-import com.machinezoo.noexception.throwing.ThrowingRunnable;
 import dev.latvian.mods.kubejs.holder.HolderWrapper;
 import dev.latvian.mods.kubejs.holder.NamespaceHolderSet;
 import dev.latvian.mods.kubejs.holder.RegExHolderSet;
@@ -22,12 +21,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public interface ServerRegistryHolderSet<R> {
 
+    @HideFromJS
     ServerRegistryHolderSet<?> EMPTY = HolderSet::empty;
 
     @HideFromJS
@@ -43,6 +42,7 @@ public interface ServerRegistryHolderSet<R> {
     HolderSet<R> convert();
 
     // Only intended for server registries, so it's unlikely to have any existing Holder(Set)s or R instances
+    @HideFromJS
     static ServerRegistryHolderSet<?> wrap(Context ctx, Object from, TypeInfo type) {
         final TypeInfo param = type.param(0);
         final Registry<?> registry = Cast.<KubeJSContext>to(ctx).lookupRegistry(param, from);
@@ -120,13 +120,8 @@ public interface ServerRegistryHolderSet<R> {
         };
     }
 
-    static <R> ServerRegistryHolderSet<R> simple(HolderSet<R> set) {
+    private static <R> ServerRegistryHolderSet<R> simple(HolderSet<R> set) {
         return () -> set;
-    }
-
-    @SuppressWarnings("all")
-    private static <R> ServerRegistryHolderSet<R> orEmpty(Optional<? extends HolderSet<R>> set) {
-        return set.map(ServerRegistryHolderSet::simple).orElse(Cast.to(EMPTY));
     }
 
     private static <R> ServerRegistryHolderSet<R> ref(ResourceKey<R> key, Registry<R> reg) {

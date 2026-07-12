@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  *      .synFunc(<single_arg_of_type_A>)
  * namespace
  *      .synFunc(<single_arg_of_type_B>)
- * }</pre> is impossible
+ * }</pre> is impossible and the last method of that length to be registered will be the only usable one
  * @param <R> The result (though not necessarily the {@code return}) of the synthetic functions
  */
 @HideFromJS

@@ -6,6 +6,7 @@ import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.*;
 import dev.latvian.mods.rhino.type.RecordTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import java.util.function.Consumer;
 )
 public record WeightedValue<T>(int weight, T value) {
 
+    @HideFromJS
     public static <T, E extends T> SimpleWeightedRandomList<T> toVanilla(List<WeightedValue<E>> weightedValues) {
         return switch (weightedValues.size()) {
             case 0 -> SimpleWeightedRandomList.empty();
@@ -66,17 +68,21 @@ public record WeightedValue<T>(int weight, T value) {
         };
     }
 
+    @HideFromJS
     public static TypeInfo listType(TypeInfo generic) {
         return TypeInfo.RAW_LIST.withParams(TYPE.withParams(generic));
     }
 
+    @HideFromJS
     public static TypeInfo listType(Class<?> generic) {
         return listType(TypeInfo.of(generic));
     }
 
-    public static final RecordTypeInfo TYPE = Cast.to(TypeInfo.of(WeightedValue.class));
+
+    private static final RecordTypeInfo TYPE = Cast.to(TypeInfo.of(WeightedValue.class));
     private static final TypeInfo CONSUMER_TYPE = TypeInfo.RAW_CONSUMER.withParams(TypeInfo.RAW_MAP.withParams(TypeInfo.STRING, TypeInfo.NONE));
 
+    @HideFromJS
     public static WeightedValue<?> wrap(Context ctx, Object from, TypeInfo target) {
         return switch (from) {
             case null -> throw Context.reportRuntimeError("Can't interpret 'null' as a weighted value", ctx);

@@ -1,6 +1,7 @@
-# 1.0.1 (W.I.P.)
-- Fix compat fix ProbeJS 8.0.2, this is the new required minimum version if present
+# 1.0.1
+- Fix compat fix ProbeJS 8.0.2, which is the new required minimum version if present
 - Add ability to define custom feature types
+- Fix `HolderSet` worldgen-registry params not functioning with lists of ids
 
 # 1.0.0
 

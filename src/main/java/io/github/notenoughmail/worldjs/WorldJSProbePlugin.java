@@ -20,7 +20,9 @@ import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.builders.ClassBuilder;
 import moe.wolfgirl.probejs.typescript.document.builders.MethodBuilder;
 import moe.wolfgirl.probejs.typescript.document.members.MethodDecl;
+import moe.wolfgirl.probejs.typescript.document.types.ClassType;
 import moe.wolfgirl.probejs.typescript.document.types.special.ObjectType;
+import moe.wolfgirl.probejs.typescript.document.types.special.RawType;
 import moe.wolfgirl.probejs.typescript.transpiler.TypeConverter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
@@ -272,7 +274,7 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             obj(r, clazz, "unobstructed", off::apply);
         }
 
-        r.addInputAlias(ServerRegistryHolderSet.class, HolderSet.class);
+        r.addInputAlias(ServerRegistryHolderSet.class, new ClassType(new ClassPath(HolderSet.class)).withParams(new RawType("R")));
     }
 
     private static Type literal(String str) {

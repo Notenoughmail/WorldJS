@@ -111,7 +111,7 @@ configurations {
 dependencies {
     implementation "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
     implementation "dev.latvian.mods:rhino:${rhino_version}"
-    implementation "curse.maven:probejs-585406:8122173"
+    implementation "curse.maven:probejs-585406:8304356"
 
     runtimeOnly "curse.maven:cyanide-541676:5782674"
 }
