@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.block.Blocks;
@@ -35,13 +36,13 @@ public class DeltaFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<D
 
     @Info("The size of the inside of the delta, in the range [0, 16]")
     public DeltaFeatureConfigurationBuilder size(IntProvider provider) {
-        size = assertRange(provider, 0, 16, "size");
+        size = Validations.assertRange(provider, 0, 16, "size");
         return this;
     }
 
     @Info("The size of the rim of the delta, in the range [0, 16]")
     public DeltaFeatureConfigurationBuilder rimSize(IntProvider provider) {
-        rimSize = assertRange(provider, 0, 16, "rimSize");
+        rimSize = Validations.assertRange(provider, 0, 16, "rimSize");
         return this;
     }
 

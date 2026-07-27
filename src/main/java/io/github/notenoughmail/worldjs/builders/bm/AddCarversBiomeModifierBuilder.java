@@ -24,9 +24,7 @@ public class AddCarversBiomeModifierBuilder extends BiomeModifierBuilder<BiomeMo
 
     @Info("The carvers to add to the biome(s)")
     public AddCarversBiomeModifierBuilder carvers(ServerRegistryHolderSet<ConfiguredWorldCarver<?>> carvers) {
-        this.carvers = carvers.verify(() -> {
-            throw err("'carvers' should not be empty");
-        });
+        this.carvers = carvers.convertWithValidation("carvers", this::err);
         return this;
     }
 

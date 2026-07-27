@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -39,7 +40,7 @@ public class MultifaceGrowthConfigurationBuilder extends ConfiguredFeatureBuilde
 
     @Info("The range to search in to place, in the range [1, 64]")
     public MultifaceGrowthConfigurationBuilder searchRange(int range) {
-        searchRange = assertRange(range, 1, 64, "searchRange");
+        searchRange = Validations.assertRange(range, 1, 64, "searchRange");
         return this;
     }
 
@@ -63,7 +64,7 @@ public class MultifaceGrowthConfigurationBuilder extends ConfiguredFeatureBuilde
 
     @Info("The chance the feature spreads, in the range [0, 1]")
     public MultifaceGrowthConfigurationBuilder chanceOfSpreading(float chance) {
-        chanceOfSpreading = assertUnit(chance, "chanceOfSpreading");
+        chanceOfSpreading = Validations.assertUnit(chance, "chanceOfSpreading");
         return this;
     }
 

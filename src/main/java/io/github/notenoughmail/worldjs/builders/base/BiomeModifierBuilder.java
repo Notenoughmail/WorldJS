@@ -28,9 +28,7 @@ public abstract class BiomeModifierBuilder<T extends BiomeModifier> extends Buil
 
     @Info("The biomes to modify")
     public BiomeModifierBuilder<T> biomes(ServerRegistryHolderSet<Biome> biomes) {
-        this.biomes = biomes.verify(() -> {
-            throw err("'biomes' should not be empty");
-        });
+        this.biomes = biomes.convertWithValidation("biomes", this::err);
         return this;
     }
 }

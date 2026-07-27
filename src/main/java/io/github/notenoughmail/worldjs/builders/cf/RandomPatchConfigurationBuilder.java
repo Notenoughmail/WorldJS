@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -26,19 +27,19 @@ public class RandomPatchConfigurationBuilder extends ConfiguredFeatureBuilder.Wi
 
     @Info("The number of attempts to generate, must be positive")
     public RandomPatchConfigurationBuilder tries(int tries) {
-        this.tries = assertPositive(tries, "tries");
+        this.tries = Validations.assertPositive(tries, "tries");
         return this;
     }
 
     @Info("The horizontal spread range, must be non-negative")
     public RandomPatchConfigurationBuilder xzSpread(int spread) {
-        xzSpread = assertNonNegative(spread, "xzSpread");
+        xzSpread = Validations.assertNonNegative(spread, "xzSpread");
         return this;
     }
 
     @Info("The vertical spread range, must be non-negative")
     public RandomPatchConfigurationBuilder ySpread(int spread) {
-        ySpread = assertNonNegative(spread, "ySpread");
+        ySpread = Validations.assertNonNegative(spread, "ySpread");
         return this;
     }
 

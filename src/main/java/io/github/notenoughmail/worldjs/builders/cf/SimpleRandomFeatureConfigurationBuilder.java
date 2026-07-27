@@ -21,9 +21,7 @@ public class SimpleRandomFeatureConfigurationBuilder extends ConfiguredFeatureBu
 
     @Info("The placed features to randomly select from to place")
     public SimpleRandomFeatureConfigurationBuilder features(ServerRegistryHolderSet<PlacedFeature> features) {
-        this.features = features.verify(() -> {
-            throw exception("'features' should not be empty");
-        });
+        this.features = features.convertWithValidation("features", this::exception);
         return this;
     }
 

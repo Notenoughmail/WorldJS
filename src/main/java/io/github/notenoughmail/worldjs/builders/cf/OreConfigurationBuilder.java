@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
@@ -31,13 +32,13 @@ public class OreConfigurationBuilder extends ConfiguredFeatureBuilder.WithFeatur
 
     @Info("The size of the ore vein, in the range [0, 64]")
     public OreConfigurationBuilder size(int size) {
-        this.size = assertRange(size, 0, 64, "size");
+        this.size = Validations.assertRange(size, 0, 64, "size");
         return this;
     }
 
     @Info("The chance the ore vein is discarded if any of its blocks neighbor air, in the range [0, 1]")
     public OreConfigurationBuilder discardChanceOnAirExposure(float chance) {
-        discardChanceOnAirExposure = assertUnit(chance, "discardChanceOnAirExposure");
+        discardChanceOnAirExposure = Validations.assertUnit(chance, "discardChanceOnAirExposure");
         return this;
     }
 

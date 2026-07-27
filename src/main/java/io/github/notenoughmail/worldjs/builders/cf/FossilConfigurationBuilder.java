@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -52,7 +53,7 @@ public class FossilConfigurationBuilder extends ConfiguredFeatureBuilder<FossilF
 
     @Info("How many corners may be empty while allowing the feature to generate, in the range [0, 7]")
     public FossilConfigurationBuilder maxEmptyCorners(int corners) {
-        maxEmptyCornersAllowed = assertRange(corners, 0, 7, "maxEmptyCorners");
+        maxEmptyCornersAllowed = Validations.assertRange(corners, 0, 7, "maxEmptyCorners");
         return this;
     }
 

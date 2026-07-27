@@ -27,9 +27,7 @@ public class RemoveCarversBiomeModifierBuilder extends BiomeModifierBuilder<Biom
 
     @Info("The carvers to remove from the biomes(s)")
     public RemoveCarversBiomeModifierBuilder carvers(ServerRegistryHolderSet<ConfiguredWorldCarver<?>> carvers) {
-        this.carvers = carvers.verify(() -> {
-            throw err("'carvers' should not be empty");
-        });
+        this.carvers = carvers.convertWithValidation("carvers", this::err);
         return this;
     }
 

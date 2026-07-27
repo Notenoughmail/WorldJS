@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -65,25 +66,25 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
 
     @Info("The amount of blocks that should be replaced by the column, in the range [1, 128]")
     public VegetationPatchConfigurationBuilder depth(IntProvider depth) {
-        this.depth = assertRange(depth, 1, 128, "depth");
+        this.depth = Validations.assertRange(depth, 1, 128, "depth");
         return this;
     }
 
     @Info("The chance to add an extra block to the height, in the range [0, 1]")
     public VegetationPatchConfigurationBuilder extraBottomBlockChance(float chance) {
-        extraBottomBlockChance = assertUnit(chance, "extraBottomBlockChance");
+        extraBottomBlockChance = Validations.assertUnit(chance, "extraBottomBlockChance");
         return this;
     }
 
     @Info("The y radius the column should search in for available placement, in the range [1, 256]")
     public VegetationPatchConfigurationBuilder verticalRange(int range) {
-        verticalRange = assertRange(range, 1, 256, "verticalRange");
+        verticalRange = Validations.assertRange(range, 1, 256, "verticalRange");
         return this;
     }
 
     @Info("The chance of placing the vegetation feature on finding a valid position, in the range [0, 1]")
     public VegetationPatchConfigurationBuilder vegetationChance(float chance) {
-        vegetationChance = assertUnit(chance, "vegetationChance");
+        vegetationChance = Validations.assertUnit(chance, "vegetationChance");
         return this;
     }
 
@@ -95,7 +96,7 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
 
     @Info("The chance to add a search position adjacent next to the initial rectangle, in the range [0, 1]")
     public VegetationPatchConfigurationBuilder extraEdgeColumnChance(float chance) {
-        extraEdgeColumnChance = assertUnit(chance, "extraEdgeColumnChance");
+        extraEdgeColumnChance = Validations.assertUnit(chance, "extraEdgeColumnChance");
         return this;
     }
 

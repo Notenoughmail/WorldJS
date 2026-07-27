@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,7 +24,7 @@ public class LayerConfigurationBuilder extends ConfiguredFeatureBuilder<LayerCon
 
     @Info("The height to fill, in the range [0, 4064]")
     public LayerConfigurationBuilder height(int height) {
-        this.height = assertRange(height, 0, DimensionType.Y_SIZE, "height");
+        this.height = Validations.assertRange(height, 0, DimensionType.Y_SIZE, "height");
         return this;
     }
 

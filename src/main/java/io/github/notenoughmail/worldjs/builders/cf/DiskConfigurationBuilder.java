@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -52,13 +53,13 @@ public class DiskConfigurationBuilder extends ConfiguredFeatureBuilder<DiskConfi
 
     @Info("The radius of the disk, in the range [0, 8]")
     public DiskConfigurationBuilder radius(IntProvider radius) {
-        this.radius = assertRange(radius, 0, 8, "radius");
+        this.radius = Validations.assertRange(radius, 0, 8, "radius");
         return this;
     }
 
     @Info("Half the height of the disk, in the range [0, 4]")
     public DiskConfigurationBuilder halfHeight(int height) {
-        halfHeight = assertRange(height, 0, 4, "halfHeight");
+        halfHeight = Validations.assertRange(height, 0, 4, "halfHeight");
         return this;
     }
 

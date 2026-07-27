@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -57,7 +58,7 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
     }
 
     private void assertLayer(double d, String name) {
-        assertRange(d, 0.01D, 50D, "layers." + name);
+        Validations.assertRange(d, 0.01D, 50D, "layers." + name);
     }
 
     @Info("The thickness of each layer")
@@ -72,40 +73,40 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
 
     @Info("The crack properties")
     public GeodeConfigurationBuilder crack(GeodeCrack crack) {
-        assertUnit(crack.generateChance(), "crack.generateChance");
-        assertRange(crack.baseSize(), 0D, 5D, "crack.baseSize");
-        assertRange(crack.pointOffset(), 0, 10, "crack.pointOffset");
+        Validations.assertUnit(crack.generateChance(), "crack.generateChance");
+        Validations.assertRange(crack.baseSize(), 0D, 5D, "crack.baseSize");
+        Validations.assertRange(crack.pointOffset(), 0, 10, "crack.pointOffset");
         this.crack = crack;
         return this;
     }
 
     @Info("The probability of placing an inner placement on a block of the inner layer, in the range [0, 1]. Defaults to 0.35")
     public GeodeConfigurationBuilder usePotentialPlacementsChance(double chance) {
-        usePotentialPlacementsChance = assertUnit(chance, "usePotentialPlacementsChance");
+        usePotentialPlacementsChance = Validations.assertUnit(chance, "usePotentialPlacementsChance");
         return this;
     }
 
     @Info("The chance to place an alternative inner layer block instead of a regular inner layer block, in the range [0, 1]. Defaults to 0")
     public GeodeConfigurationBuilder useAlternativeLayer0Chance(double chance) {
-        useAlternativeLayer0Chance = assertUnit(chance, "useAlternativeLayer0Chance");
+        useAlternativeLayer0Chance = Validations.assertUnit(chance, "useAlternativeLayer0Chance");
         return this;
     }
 
     @Info("The offset on each coordinate of the center from the feature start, in the range [1, 20]. Defaults to uniformly over {4, 5}")
     public GeodeConfigurationBuilder outerWallDistance(IntProvider provider) {
-        outWallDistance = assertRange(provider, 1, 20, "outerWallDistance");
+        outWallDistance = Validations.assertRange(provider, 1, 20, "outerWallDistance");
         return this;
     }
 
     @Info("The number of distribution points, in the range [1, 20]. Defaults to uniformly over {3, 4}")
     public GeodeConfigurationBuilder distributionPoints(IntProvider provider) {
-        distributionPoints = assertRange(provider, 1, 20, "distributionPoints");
+        distributionPoints = Validations.assertRange(provider, 1, 20, "distributionPoints");
         return this;
     }
 
     @Info("The point offset, in the range [0, 10]. Defaults to uniformly over {1, 2}")
     public GeodeConfigurationBuilder pointOffset(IntProvider provider) {
-        pointOffset = assertRange(provider, 0, 10, "pointOffset");
+        pointOffset = Validations.assertRange(provider, 0, 10, "pointOffset");
         return this;
     }
 
@@ -123,7 +124,7 @@ public class GeodeConfigurationBuilder extends ConfiguredFeatureBuilder<GeodeCon
 
     @Info("The noise multiplier, in the range [0, 1]. Defaults to 0.05")
     public GeodeConfigurationBuilder noiseMultiplier(double multiplier) {
-        noiseMultiplier = assertUnit(multiplier, "noiseMultiplier");
+        noiseMultiplier = Validations.assertUnit(multiplier, "noiseMultiplier");
         return this;
     }
 

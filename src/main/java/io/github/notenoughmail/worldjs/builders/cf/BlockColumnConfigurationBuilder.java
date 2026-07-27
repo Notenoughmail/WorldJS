@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -40,7 +41,7 @@ public class BlockColumnConfigurationBuilder extends ConfiguredFeatureBuilder<Bl
     )
     public BlockColumnConfigurationBuilder layer(IntProvider height, BlockStateProvider state) {
         layers.add(BlockColumnConfiguration.layer(
-                assertNonNegative(height, "height"),
+                Validations.assertNonNegative(height, "height"),
                 state
         ));
         return this;

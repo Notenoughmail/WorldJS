@@ -10,6 +10,7 @@ import dev.latvian.mods.kubejs.script.RecordDefaultsRegistry;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.builders.base.DimensionTypeBuilder;
 import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.bm.*;
 import io.github.notenoughmail.worldjs.builders.cf.*;
@@ -122,6 +123,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
             bm(c, "add_spawn_costs", AddSpawnCostsBiomeModifierBuilder.class, AddSpawnCostsBiomeModifierBuilder::new);
             bm(c, "remove_spawn_costs", RemoveSpawnCostsBiomeModifierBuilder.class, RemoveSpawnCostsBiomeModifierBuilder::new);
         });
+        registry.addDefault(Registries.DIMENSION_TYPE, DimensionTypeBuilder.class, DimensionTypeBuilder::new);
     }
 
     private static <C, B extends BuilderBase<? extends C>> void add(BuilderTypeRegistry.Callback<C> callback, ResourceLocation id, Class<B> builderType, BuilderFactory factory) {
@@ -166,6 +168,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
         registry.register(GeodeConfigurationBuilder.GeodeBlocks.DEFAULT);
         registry.register(GeodeConfigurationBuilder.GeodeLayers.DEFAULT);
         registry.register(GeodeConfigurationBuilder.GeodeCrack.DEFAULT);
+        registry.register(DimensionTypeBuilder.DEFAULT_MONSTER_SETTINGS);
     }
 
     @Override

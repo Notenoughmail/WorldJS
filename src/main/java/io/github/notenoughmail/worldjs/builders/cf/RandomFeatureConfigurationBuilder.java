@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -35,7 +36,7 @@ public class RandomFeatureConfigurationBuilder extends ConfiguredFeatureBuilder<
     public RandomFeatureConfigurationBuilder withFeature(Holder.Reference<PlacedFeature> feature, float chance) {
         features.add(new WeightedPlacedFeature(
                 feature,
-                assertUnit(chance, "chance")
+                Validations.assertUnit(chance, "chance")
         ));
         return this;
     }

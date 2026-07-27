@@ -5,7 +5,6 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
 import io.github.notenoughmail.worldjs.util.synmethod.MethodNamespace;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Consumer;

@@ -1,7 +1,6 @@
 package io.github.notenoughmail.worldjs.util;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
-import dev.latvian.mods.rhino.Callable;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.Undefined;

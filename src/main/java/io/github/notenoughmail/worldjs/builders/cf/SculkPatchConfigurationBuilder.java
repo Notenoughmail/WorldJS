@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -30,31 +31,31 @@ public class SculkPatchConfigurationBuilder extends ConfiguredFeatureBuilder<Scu
 
     @Info("The number of charges, in the range [1, 32]")
     public SculkPatchConfigurationBuilder chargeCount(int count) {
-        chargeCount = assertRange(count, 1, 32, "chargeCount");
+        chargeCount = Validations.assertRange(count, 1, 32, "chargeCount");
         return this;
     }
 
     @Info("The initial value of each charge, in the range [1, 500]")
     public SculkPatchConfigurationBuilder amountPerCharge(int amount) {
-        amountPerCharge = assertRange(amount, 1, 500, "amountPerCharge");
+        amountPerCharge = Validations.assertRange(amount, 1, 500, "amountPerCharge");
         return this;
     }
 
     @Info("The number of attempts to spread, in the range [1, 64]")
     public SculkPatchConfigurationBuilder spreadAttempts(int attempts) {
-        spreadAttempts = assertRange(attempts, 1, 64, "spreadAttempts");
+        spreadAttempts = Validations.assertRange(attempts, 1, 64, "spreadAttempts");
         return this;
     }
 
     @Info("The number of times to generate, in the range [0, 8]")
     public SculkPatchConfigurationBuilder growthRounds(int rounds) {
-        growthRounds = assertRange(rounds, 0, 8, "growthRounds");
+        growthRounds = Validations.assertRange(rounds, 0, 8, "growthRounds");
         return this;
     }
 
     @Info("The number of times to spread, in the range [0, 8]")
     public SculkPatchConfigurationBuilder spreadRounds(int rounds) {
-        spreadRounds = assertRange(rounds, 0, 8, "spreadRounds");
+        spreadRounds = Validations.assertRange(rounds, 0, 8, "spreadRounds");
         return this;
     }
 
@@ -66,7 +67,7 @@ public class SculkPatchConfigurationBuilder extends ConfiguredFeatureBuilder<Scu
 
     @Info("The chance of generating a catalyst, in the range [0, 1]")
     public SculkPatchConfigurationBuilder catalystChance(float chance) {
-        catalystChance = assertUnit(chance, "catalystChance");
+        catalystChance = Validations.assertUnit(chance, "catalystChance");
         return this;
     }
 

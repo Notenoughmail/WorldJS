@@ -30,9 +30,7 @@ public class AddFeaturesBiomeModifierBuilder extends BiomeModifierBuilder<BiomeM
 
     @Info("The feature(s) to add to the biome(s)")
     public AddFeaturesBiomeModifierBuilder features(ServerRegistryHolderSet<PlacedFeature> features) {
-        this.features = features.verify(() -> {
-            throw err("'features' should not be empty");
-        });
+        this.features = features.convertWithValidation("features", this::err);
         return this;
     }
 

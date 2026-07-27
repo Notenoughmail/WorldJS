@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.util;
 
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.holder.HolderWrapper;
 import dev.latvian.mods.kubejs.holder.NamespaceHolderSet;
 import dev.latvian.mods.kubejs.holder.RegExHolderSet;
@@ -17,10 +18,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.registries.holdersets.OrHolderSet;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -29,6 +32,7 @@ public interface ServerRegistryHolderSet<R> {
     @HideFromJS
     ServerRegistryHolderSet<?> EMPTY = HolderSet::empty;
 
+    @Deprecated(forRemoval = true)
     @HideFromJS
     default HolderSet<R> verify(Runnable err) {
         final HolderSet<R> set = convert();
@@ -38,6 +42,15 @@ public interface ServerRegistryHolderSet<R> {
         return set;
     }
 
+    @HideFromJS
+    default HolderSet<R> convertWithValidation(String name, Function<String, KubeRuntimeException> messageWrapper) {
+        final HolderSet<R> set = convert();
+        if (set instanceof HolderSet.Direct<R> dir && dir.size() == 0)
+            throw messageWrapper.apply("'" + name + "' should not be empty!");
+        return set;
+    }
+
+    @ApiStatus.Internal
     @HideFromJS
     HolderSet<R> convert();
 

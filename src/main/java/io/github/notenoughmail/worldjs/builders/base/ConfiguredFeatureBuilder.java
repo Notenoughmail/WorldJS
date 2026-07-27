@@ -10,6 +10,7 @@ import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.FloatProvider;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -37,91 +39,76 @@ public abstract class ConfiguredFeatureBuilder<FC extends FeatureConfiguration> 
         return i -> factory.apply(i, feature);
     }
 
+    @Deprecated(forRemoval = true)
     protected static int assertPositive(int val, String name) {
-        if (val < 1)
-            throw new IllegalArgumentException("'" + name + "' must be > 0");
-        return val;
+        return Validations.assertPositive(val, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static int assertNonNegative(int val, String name) {
-        if (val < 0)
-            throw new IllegalArgumentException("'" + name + "' must be >= 0");
-        return val;
+        return Validations.assertNonNegative(val, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static int assertRange(int val, int min, int max, String name) {
-        if (val < min || val > max)
-            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
-        return val;
+        return Validations.assertRange(val, min, max, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static float assertRange(float val, float min, float max, String name) {
-        if (val < min || val > max)
-            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
-        return val;
+        return Validations.assertRange(val, min, max, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static double assertRange(double val, double min, double max, String name) {
-        if (val < min || val > max)
-            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
-        return val;
+        return Validations.assertRange(val, min, max, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static float assertUnit(float val, String name) {
-        return assertRange(val, 0f, 1f, name);
+        return Validations.assertUnit(val, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static double assertUnit(double val, String name) {
-        return assertRange(val, 0D, 1D, name);
+        return Validations.assertUnit(val, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static IntProvider assertRange(IntProvider provider, int min, int max, String name) {
-        if (provider.getMinValue() < min || provider.getMaxValue() > max)
-            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
-        return provider;
+        return Validations.assertRange(provider, min, max, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static IntProvider assertNonNegative(IntProvider provider, String name) {
-        if (provider.getMinValue() < 0)
-            throw new IllegalArgumentException("'" + name + "' must be >= 0");
-        return provider;
+        return Validations.assertNonNegative(provider, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static IntProvider assertPositive(IntProvider provider, String name) {
-        if (provider.getMinValue() < 1)
-            throw new IllegalArgumentException("'" + name + "' must be > 0");
-        return provider;
+        return Validations.assertPositive(provider, name);
     }
 
+    @Deprecated(forRemoval = true)
     protected static FloatProvider assertRange(FloatProvider provider, float min, float max, String name) {
-        if (provider.getMinValue() < min || provider.getMaxValue() > max)
-            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
-        return provider;
+        return Validations.assertRange(provider, min, max, name);
     }
 
+    @Contract("null, _ -> fail; _, _ -> !null")
     protected <T> T notNull(T t, String name) {
-        if (t == null) {
-            throw exception("'" + name + "' must be defined!");
-        }
-        return t;
+        return Validations.notNull(t, name, sourceLine);
     }
 
     protected <C extends Collection<? extends T>, T> C notEmpty(C collection, String name) {
-        if (collection.isEmpty()) {
-            throw exception("'" + name + "' must not be empty!");
-        }
-        return collection;
+        return Validations.notEmpty(collection, name, sourceLine);
     }
 
     protected <T> T validate(T t, Function<T, @Nullable String> errorMsgFunc) {
-        final String str = errorMsgFunc.apply(t);
-        if (str == null) return t;
-        throw exception(str);
+        return Validations.validate(t, errorMsgFunc, this::exception);
     }
 
     protected KubeRuntimeException exception(String message) {
-        return new KubeRuntimeException(message)
-                .source(sourceLine)
+        return Validations.exception(sourceLine, message)
                 .customData("configured feature", id);
     }
 

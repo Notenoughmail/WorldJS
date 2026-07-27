@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.builders.cf;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -29,13 +30,13 @@ public class NetherForestVegetationConfigBuilder extends ConfiguredFeatureBuilde
 
     @Info("The horizontal distance to spread over, must be positive")
     public NetherForestVegetationConfigBuilder spreadWidth(int width) {
-        this.width = assertPositive(width, "Spread width must be positive");
+        this.width = Validations.assertPositive(width, "Spread width must be positive");
         return this;
     }
 
     @Info("the vertical distance to spread over, must be positive")
     public NetherForestVegetationConfigBuilder spreadHeight(int height) {
-        this.height = assertPositive(height, "Spread height must be positive");
+        this.height = Validations.assertPositive(height, "Spread height must be positive");
         return this;
     }
 
