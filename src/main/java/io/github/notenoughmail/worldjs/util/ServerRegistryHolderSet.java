@@ -5,6 +5,7 @@ import dev.latvian.mods.kubejs.holder.HolderWrapper;
 import dev.latvian.mods.kubejs.holder.NamespaceHolderSet;
 import dev.latvian.mods.kubejs.holder.RegExHolderSet;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
+import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.kubejs.util.RegExpKJS;
 import dev.latvian.mods.rhino.Context;
@@ -47,6 +48,14 @@ public interface ServerRegistryHolderSet<R> {
         final HolderSet<R> set = convert();
         if (set instanceof HolderSet.Direct<R> dir && dir.size() == 0)
             throw messageWrapper.apply("'" + name + "' should not be empty!");
+        return set;
+    }
+
+    @HideFromJS
+    default HolderSet<R> convertWithValidation(String name, SourceLine source) {
+        final HolderSet<R> set = convert();
+        if (set instanceof HolderSet.Direct<R> dir && dir.size() == 0)
+            throw Validations.exception(source, "'" + name + "' should not be empty!");
         return set;
     }
 

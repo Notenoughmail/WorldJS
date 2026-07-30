@@ -1,11 +1,23 @@
 package io.github.notenoughmail.worldjs;
 
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.logging.LogUtils;
 import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.util.Cast;
+import io.github.notenoughmail.worldjs.builders.bs.CheckerboardBiomeSourceBuilder;
+import io.github.notenoughmail.worldjs.builders.bs.EndBiomeSourceBuilder;
+import io.github.notenoughmail.worldjs.builders.bs.FixedBiomeSourceBuilder;
+import io.github.notenoughmail.worldjs.builders.bs.MultiNoiseBiomeSourceBuilder;
+import io.github.notenoughmail.worldjs.builders.cg.DebugChunkGeneratorBuilder;
+import io.github.notenoughmail.worldjs.builders.cg.FlatChunkGeneratorBuilder;
+import io.github.notenoughmail.worldjs.builders.cg.NoiseBasedChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.types.features.WeightedRandomSelectorFeature;
+import io.github.notenoughmail.worldjs.util.event.BiomeSourceTypeRegisterEvent;
+import io.github.notenoughmail.worldjs.util.event.ChunkGeneratorTypeRegisterEvent;
 import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
 import io.github.notenoughmail.worldjs.util.synmethod.Args;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +28,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.placement.*;
+import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -24,7 +37,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static io.github.notenoughmail.worldjs.util.Types.*;
 
@@ -36,6 +53,10 @@ public class WorldJS {
 
     public static ResourceLocation identifier(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    }
+
+    public static ResourceLocation mc(String path) {
+        return ResourceLocation.withDefaultNamespace(path);
     }
 
     private static final Set<Throwable> THROWN = new HashSet<>();
@@ -53,8 +74,19 @@ public class WorldJS {
 
     public WorldJS(IEventBus modBus) {
         NeoForge.EVENT_BUS.addListener(this::addVanillaPlacementModifiers);
+        NeoForge.EVENT_BUS.addListener(this::addVanillaChunkGeneratorTypes);
+        NeoForge.EVENT_BUS.addListener(this::addVanillaBiomeSourceTypes);
 
         FEATURES.register(modBus);
+    }
+
+    public static <V, E extends Event> Supplier<Map<ResourceLocation, V>> eventMap(Function<BiConsumer<ResourceLocation, V>, E> eventConstructor) {
+        return Suppliers.memoize(() ->
+                Util.make(
+                        ImmutableMap.<ResourceLocation, V>builder(),
+                        m -> NeoForge.EVENT_BUS.post(eventConstructor.apply(m::put))
+                ).build()
+        );
     }
 
     private void addVanillaPlacementModifiers(PlacedFeatureModifierEvent event) {
@@ -323,6 +355,47 @@ public class WorldJS {
         // if (!FMLEnvironment.production) {
         //     mc.printAll();
         // }
+    }
+
+    private void addVanillaChunkGeneratorTypes(ChunkGeneratorTypeRegisterEvent event) {
+        event.register(
+                mc("debug"),
+                DebugChunkGeneratorBuilder.class,
+                DebugChunkGeneratorBuilder::new
+        );
+        event.register(
+                mc("flat"),
+                FlatChunkGeneratorBuilder.class,
+                FlatChunkGeneratorBuilder::new
+        );
+        event.register(
+                mc("noise"),
+                NoiseBasedChunkGeneratorBuilder.class,
+                NoiseBasedChunkGeneratorBuilder::new
+        );
+    }
+
+    private void addVanillaBiomeSourceTypes(BiomeSourceTypeRegisterEvent event) {
+        event.register(
+                mc("the_end"),
+                EndBiomeSourceBuilder.class,
+                EndBiomeSourceBuilder::new
+        );
+        event.register(
+                mc("fixed"),
+                FixedBiomeSourceBuilder.class,
+                FixedBiomeSourceBuilder::new
+        );
+        event.register(
+                mc("checkerboard"),
+                CheckerboardBiomeSourceBuilder.class,
+                CheckerboardBiomeSourceBuilder::new
+        );
+        event.register(
+                mc("multi_noise"),
+                MultiNoiseBiomeSourceBuilder.class,
+                MultiNoiseBiomeSourceBuilder::new
+        );
     }
 
     private static IntProvider intProvider(Object o) {

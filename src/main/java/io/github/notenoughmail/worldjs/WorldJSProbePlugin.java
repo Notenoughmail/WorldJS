@@ -2,6 +2,12 @@ package io.github.notenoughmail.worldjs;
 
 import com.google.gson.JsonObject;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
+import io.github.notenoughmail.worldjs.builders.base.ChunkGeneratorBuilder;
+import io.github.notenoughmail.worldjs.builders.base.SubBuilder;
+import io.github.notenoughmail.worldjs.builders.base.WorldPresetBuilder;
+import io.github.notenoughmail.worldjs.builders.cg.NoiseBasedChunkGeneratorBuilder;
+import io.github.notenoughmail.worldjs.types.assist.ClimateParameterListBuilder;
 import io.github.notenoughmail.worldjs.util.PlacementModifiers;
 import io.github.notenoughmail.worldjs.util.ServerRegistryHolderSet;
 import io.github.notenoughmail.worldjs.util.WeightedValue;
@@ -12,6 +18,7 @@ import moe.wolfgirl.probejs.plugin.builtins.alias.RecordTypes;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.Documents;
 import moe.wolfgirl.probejs.typescript.base.AliasRegistrar;
+import moe.wolfgirl.probejs.typescript.document.ClassDecl;
 import moe.wolfgirl.probejs.typescript.document.Members;
 import moe.wolfgirl.probejs.typescript.document.Types;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
@@ -20,11 +27,13 @@ import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.builders.ClassBuilder;
 import moe.wolfgirl.probejs.typescript.document.builders.MethodBuilder;
 import moe.wolfgirl.probejs.typescript.document.members.MethodDecl;
-import moe.wolfgirl.probejs.typescript.document.types.ClassType;
 import moe.wolfgirl.probejs.typescript.document.types.special.ObjectType;
-import moe.wolfgirl.probejs.typescript.document.types.special.RawType;
 import moe.wolfgirl.probejs.typescript.transpiler.TypeConverter;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
@@ -36,7 +45,11 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.github.notenoughmail.worldjs.util.Types.*;
 
@@ -44,19 +57,33 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
 
     static {
         RecordTypes.SKIP_RECORDS.add(WeightedValue.class);
+        RecordTypes.SKIP_RECORDS.add(ClimateParameterListBuilder.Entry.class);
+    }
+
+    static <I, II, III> Stream<Class<?>> provide(Supplier<Map<I, SubBuilder.Info<II, ? extends III>>> source) {
+        return source.get()
+                .values()
+                .stream()
+                .map(SubBuilder.Info::type)
+                .map(TypeInfo::asClass);
     }
 
     @Override
     public Set<Class<?>> provideClassForDiscovery() {
-        return Set.of(
-                WeightedValue.class,
-                PlacementModifiers.class,
-                HeightProvider.class,
-                BlockPredicate.class,
-                OreConfiguration.TargetBlockState.class,
-                BlockStateProvider.class,
-                VerticalAnchor.class
-        );
+        return Stream.of(
+                Stream.of(
+                        WeightedValue.class,
+                        PlacementModifiers.class,
+                        HeightProvider.class,
+                        BlockPredicate.class,
+                        OreConfiguration.TargetBlockState.class,
+                        BlockStateProvider.class,
+                        VerticalAnchor.class
+                ),
+                provide(ChunkGeneratorBuilder.ALL_TYPES),
+                provide(BiomeSourceBuilder.ALL_TYPES)
+        ).flatMap(Function.identity())
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -274,7 +301,47 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             obj(r, clazz, "unobstructed", off::apply);
         }
 
-        r.addInputAlias(ServerRegistryHolderSet.class, new ClassType(new ClassPath(HolderSet.class)).withParams(new RawType("R")));
+        r.addInputAlias(ServerRegistryHolderSet.class, Types.clazz(HolderSet.class).withParams(Types.raw("R")));
+    }
+
+    private static final Type LEVEL_STEM_KEY = Types.clazz(ResourceKey.class).withParams(Types.clazz(LevelStem.class));
+    private static final Type DIM_TYPE_HOLDER = Types.clazz(Holder.Reference.class).withParams(Types.clazz(DimensionType.class));
+
+    @Override
+    public void transformClass(Documents.ClassDocument document) {
+        if (document.classInfo().clazz() == WorldPresetBuilder.class) {
+            final TypeConverter converter = new TypeConverter();
+            final ClassDecl decl = document.document();
+            decl.members.removeIf(code -> code instanceof MethodDecl method && method.name.equals("withDimension"));
+            for (var entry : ChunkGeneratorBuilder.ALL_TYPES.get().entrySet()) {
+                final String type = entry.getKey().toString();
+                final Type typeType = converter.convertType(entry.getValue().type());
+                decl.members.add(
+                        new MethodBuilder("withDimension")
+                                .returnType(Types.THIS)
+                                .param("id", LEVEL_STEM_KEY)
+                                .param("dimensionType", DIM_TYPE_HOLDER)
+                                .param("generatorType", Types.literal(type))
+                                .param("generatorBuilder", Types.clazz(Consumer.class).withParams(typeType))
+                                .build()
+                );
+            }
+        } else if (document.classInfo().clazz() == NoiseBasedChunkGeneratorBuilder.class) {
+            final TypeConverter converter = new TypeConverter();
+            final ClassDecl decl = document.document();
+            decl.members.removeIf(code -> code instanceof MethodDecl method && method.name.equals("biomeSource"));
+            for (var entry : BiomeSourceBuilder.ALL_TYPES.get().entrySet()) {
+                final String type = entry.getKey().toString();
+                final Type typeType = converter.convertType(entry.getValue().type());
+                decl.members.add(
+                        new MethodBuilder("biomeSource")
+                                .returnType(Types.THIS)
+                                .param("type", Types.literal(type))
+                                .param("biomeSourceBuilder", Types.clazz(Consumer.class).withParams(typeType))
+                                .build()
+                );
+            }
+        }
     }
 
     private static Type literal(String str) {

@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * Register namespaced synthetic {@link PlacementModifier} functions to {@link PlacementModifiers} for use in
  * {@link io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder#modifiers(Consumer) PlacedFeatureBuilder#modifiers}
  */
-public class PlacedFeatureModifierEvent extends Event implements SyntheticFunctionEvent<PlacementModifier> {
+public final class PlacedFeatureModifierEvent extends Event implements SyntheticFunctionEvent<PlacementModifier> {
 
     public static Map<String, MethodNamespace<PlacementModifier>> createNamespaces() {
         final Map<String, MethodNamespace<PlacementModifier>> m = new HashMap<>();

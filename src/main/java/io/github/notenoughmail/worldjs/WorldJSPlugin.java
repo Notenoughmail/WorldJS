@@ -12,6 +12,7 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
 import io.github.notenoughmail.worldjs.builders.base.DimensionTypeBuilder;
 import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
+import io.github.notenoughmail.worldjs.builders.base.WorldPresetBuilder;
 import io.github.notenoughmail.worldjs.builders.bm.*;
 import io.github.notenoughmail.worldjs.builders.cf.*;
 import io.github.notenoughmail.worldjs.types.features.KubeFeature;
@@ -124,6 +125,7 @@ public class WorldJSPlugin implements KubeJSPlugin {
             bm(c, "remove_spawn_costs", RemoveSpawnCostsBiomeModifierBuilder.class, RemoveSpawnCostsBiomeModifierBuilder::new);
         });
         registry.addDefault(Registries.DIMENSION_TYPE, DimensionTypeBuilder.class, DimensionTypeBuilder::new);
+        registry.addDefault(Registries.WORLD_PRESET, WorldPresetBuilder.class, WorldPresetBuilder::new);
     }
 
     private static <C, B extends BuilderBase<? extends C>> void add(BuilderTypeRegistry.Callback<C> callback, ResourceLocation id, Class<B> builderType, BuilderFactory factory) {
