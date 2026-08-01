@@ -1,6 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cg;
 
 import com.google.common.base.Suppliers;
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.WorldJS;
@@ -47,11 +48,13 @@ public class FlatChunkGeneratorBuilder extends ChunkGeneratorBuilder<FlatLevelSo
         super(id);
     }
 
+    @Info("The structure sets to place in the world. Defaults to all structure sets")
     public FlatChunkGeneratorBuilder structureOverrides(ServerRegistryHolderSet<StructureSet> structures) {
         structureOverrides = structures.convertWithValidation("structureOverrides", sourceLine);
         return this;
     }
 
+    @Info("Adds a layer to the generator's settings")
     public FlatChunkGeneratorBuilder addLayer(int height, Block block) {
         layers.add(new FlatLayerInfo(
                 Validations.assertRange(height, 0, DimensionType.Y_SIZE, "addLayer.height"),
@@ -60,17 +63,20 @@ public class FlatChunkGeneratorBuilder extends ChunkGeneratorBuilder<FlatLevelSo
         return this;
     }
 
+    @Info("The biome of the world. Defaults to 'minecraft:plains'")
     public FlatChunkGeneratorBuilder biome(Holder.Reference<Biome> biome) {
         this.biome = biome;
         return this;
     }
 
-    public FlatChunkGeneratorBuilder withLakes() {
+    @Info("Makes lava lakes spawn in the world")
+    public FlatChunkGeneratorBuilder withLavaLakes() {
         lakes = true;
         return this;
     }
 
-    public FlatChunkGeneratorBuilder withFeatures() {
+    @Info("Allows biome-specific placed features to generate")
+    public FlatChunkGeneratorBuilder withBiomeFeatures() {
         decoration = true;
         return this;
     }

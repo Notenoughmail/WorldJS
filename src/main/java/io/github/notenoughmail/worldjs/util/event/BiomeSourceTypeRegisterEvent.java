@@ -11,9 +11,9 @@ import java.util.function.Function;
 
 public final class BiomeSourceTypeRegisterEvent extends Event {
 
-    private final BiConsumer<ResourceLocation, SubBuilder.Info<ResourceLocation, ? extends BiomeSourceBuilder<?>>> receptor;
+    private final BiConsumer<ResourceLocation, SubBuilder.SubBuilderInfo<ResourceLocation, ? extends BiomeSourceBuilder<?>>> receptor;
 
-    public BiomeSourceTypeRegisterEvent(BiConsumer<ResourceLocation, SubBuilder.Info<ResourceLocation, ? extends BiomeSourceBuilder<?>>> receptor) {
+    public BiomeSourceTypeRegisterEvent(BiConsumer<ResourceLocation, SubBuilder.SubBuilderInfo<ResourceLocation, ? extends BiomeSourceBuilder<?>>> receptor) {
         this.receptor = receptor;
     }
 
@@ -30,6 +30,6 @@ public final class BiomeSourceTypeRegisterEvent extends Event {
             TypeInfo type,
             Function<ResourceLocation, T> constructor
     ) {
-        receptor.accept(typeId, new SubBuilder.Info<>(type, constructor));
+        receptor.accept(typeId, new SubBuilder.SubBuilderInfo<>(type, constructor));
     }
 }

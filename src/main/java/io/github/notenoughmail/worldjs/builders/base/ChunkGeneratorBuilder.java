@@ -16,7 +16,7 @@ public abstract class ChunkGeneratorBuilder<G extends ChunkGenerator> extends Su
 
     public static final Supplier<Map<
             ResourceLocation,
-            Info<ResourceKey<LevelStem>, ? extends ChunkGeneratorBuilder<?>>
+            SubBuilderInfo<ResourceKey<LevelStem>, ? extends ChunkGeneratorBuilder<?>>
             >> ALL_TYPES = WorldJS.eventMap(ChunkGeneratorTypeRegisterEvent::new);
 
     protected final ResourceKey<LevelStem> id;

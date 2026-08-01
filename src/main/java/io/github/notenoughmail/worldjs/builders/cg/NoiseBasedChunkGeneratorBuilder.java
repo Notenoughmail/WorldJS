@@ -1,5 +1,7 @@
 package io.github.notenoughmail.worldjs.builders.cg;
 
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
@@ -26,12 +28,21 @@ public class NoiseBasedChunkGeneratorBuilder extends ChunkGeneratorBuilder<Noise
         super(id);
     }
 
+    @Info("The noise settings of the world")
     public NoiseBasedChunkGeneratorBuilder noiseSettings(Holder.Reference<NoiseGeneratorSettings> settings) {
         noiseSettings = settings;
         return this;
     }
 
-    public NoiseBasedChunkGeneratorBuilder biomeSource(Context ctx, ResourceLocation type, Consumer<BiomeSourceBuilder<?>> biomeSourceBuilder) {
+    @Info(value = "Settings for the biome layout of the world", params = {
+            @Param(name = "type", value = "The biome source builder type to use for the world"),
+            @Param(name = "biomeSourceBuilder", value = "Builder for the biome source")
+    })
+    public NoiseBasedChunkGeneratorBuilder biomeSource(
+            Context ctx,
+            ResourceLocation type,
+            Consumer<BiomeSourceBuilder<?>> biomeSourceBuilder
+    ) {
         biomeSource = SubBuilder.build(
                 ctx,
                 type,

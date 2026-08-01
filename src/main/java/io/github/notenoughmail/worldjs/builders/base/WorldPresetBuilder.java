@@ -1,6 +1,8 @@
 package io.github.notenoughmail.worldjs.builders.base;
 
 import dev.latvian.mods.kubejs.registry.BuilderBase;
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.Context;
 import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
@@ -23,6 +25,12 @@ public class WorldPresetBuilder extends BuilderBase<WorldPreset> {
         super(id);
     }
 
+    @Info(value = "Add a dimension to the preset. 'minecraft:overworld' must be defined", params = {
+            @Param(name = "id", value = "The id of the dimension"),
+            @Param(name = "dimensionType", value = "The id of a pre-existing dimension type to use for the dimension"),
+            @Param(name = "generatorType", value = "The chunk generator type to use for the dimension"),
+            @Param(name = "generatorBuilder", value = "Builder for the chunk generator")
+    })
     public WorldPresetBuilder withDimension(
             Context ctx,
             ResourceKey<LevelStem> id,

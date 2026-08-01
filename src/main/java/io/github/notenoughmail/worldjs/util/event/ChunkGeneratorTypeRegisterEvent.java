@@ -13,9 +13,9 @@ import java.util.function.Function;
 
 public final class ChunkGeneratorTypeRegisterEvent extends Event {
 
-    private final BiConsumer<ResourceLocation, SubBuilder.Info<ResourceKey<LevelStem>, ? extends ChunkGeneratorBuilder<?>>> receptor;
+    private final BiConsumer<ResourceLocation, SubBuilder.SubBuilderInfo<ResourceKey<LevelStem>, ? extends ChunkGeneratorBuilder<?>>> receptor;
 
-    public ChunkGeneratorTypeRegisterEvent(BiConsumer<ResourceLocation, SubBuilder.Info<ResourceKey<LevelStem>, ? extends ChunkGeneratorBuilder<?>>> receptor) {
+    public ChunkGeneratorTypeRegisterEvent(BiConsumer<ResourceLocation, SubBuilder.SubBuilderInfo<ResourceKey<LevelStem>, ? extends ChunkGeneratorBuilder<?>>> receptor) {
         this.receptor = receptor;
     }
 
@@ -32,6 +32,6 @@ public final class ChunkGeneratorTypeRegisterEvent extends Event {
             TypeInfo type,
             Function<ResourceKey<LevelStem>, T> constructor
     ) {
-        receptor.accept(typeId, new SubBuilder.Info<>(type, constructor));
+        receptor.accept(typeId, new SubBuilder.SubBuilderInfo<>(type, constructor));
     }
 }

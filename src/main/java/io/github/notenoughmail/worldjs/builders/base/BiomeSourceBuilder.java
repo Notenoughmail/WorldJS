@@ -14,7 +14,7 @@ public abstract class BiomeSourceBuilder<B extends BiomeSource> extends SubBuild
 
     public static final Supplier<Map<
             ResourceLocation,
-            Info<ResourceLocation, ? extends BiomeSourceBuilder<?>>
+            SubBuilderInfo<ResourceLocation, ? extends BiomeSourceBuilder<?>>
             >> ALL_TYPES = WorldJS.eventMap(BiomeSourceTypeRegisterEvent::new);
 
     protected final ResourceLocation typeId;

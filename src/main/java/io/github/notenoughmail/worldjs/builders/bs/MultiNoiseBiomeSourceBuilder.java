@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bs;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
 import io.github.notenoughmail.worldjs.types.assist.ClimateParameterListBuilder;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Info("Places biomes using noise values")
 @ReturnsSelf
 public class MultiNoiseBiomeSourceBuilder extends BiomeSourceBuilder<MultiNoiseBiomeSource> {
 
@@ -27,11 +29,13 @@ public class MultiNoiseBiomeSourceBuilder extends BiomeSourceBuilder<MultiNoiseB
         super(id);
     }
 
+    @Info("The parameter preset to use")
     public MultiNoiseBiomeSourceBuilder usingPreset(Holder.Reference<MultiNoiseBiomeSourceParameterList> preset) {
         this.preset = preset;
         return this;
     }
 
+    @Info("Build the climate parameters using a callback")
     public MultiNoiseBiomeSourceBuilder usingParameters(Consumer<ClimateParameterListBuilder> parameters) {
         this.parameters = Util.make(new ClimateParameterListBuilder(), parameters).build();
         return this;

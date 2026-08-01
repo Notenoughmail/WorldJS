@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.bs;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
 import io.github.notenoughmail.worldjs.util.Validations;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.FixedBiomeSource;
 import org.jetbrains.annotations.Nullable;
 
+@Info("A single biome across the whole world")
 @ReturnsSelf
 public class FixedBiomeSourceBuilder extends BiomeSourceBuilder<FixedBiomeSource> {
 
@@ -19,6 +21,7 @@ public class FixedBiomeSourceBuilder extends BiomeSourceBuilder<FixedBiomeSource
         super(id);
     }
 
+    @Info("The single biome to use")
     public FixedBiomeSourceBuilder biome(Holder.Reference<Biome> biome) {
         this.biome = biome;
         return this;

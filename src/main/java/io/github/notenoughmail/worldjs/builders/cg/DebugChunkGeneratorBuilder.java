@@ -1,5 +1,6 @@
 package io.github.notenoughmail.worldjs.builders.cg;
 
+import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import io.github.notenoughmail.worldjs.builders.base.ChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.util.Validations;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.DebugLevelSource;
 import org.jetbrains.annotations.Nullable;
 
+@Info("Contains all possible blocks states laid out in a grid at y = 70")
 @ReturnsSelf
 public class DebugChunkGeneratorBuilder extends ChunkGeneratorBuilder<DebugLevelSource> {
 
@@ -20,6 +22,7 @@ public class DebugChunkGeneratorBuilder extends ChunkGeneratorBuilder<DebugLevel
         super(id);
     }
 
+    @Info("The biome to place the states in")
     public DebugChunkGeneratorBuilder biome(Holder.Reference<Biome> biome) {
         this.biome = biome;
         return this;

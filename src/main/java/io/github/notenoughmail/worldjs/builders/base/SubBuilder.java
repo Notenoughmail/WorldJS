@@ -22,11 +22,11 @@ public abstract class SubBuilder<T> {
             ResourceLocation typeId,
             C constructorArg,
             Consumer<B> builder,
-            Supplier<Map<ResourceLocation, Info<C, ? extends B>>> types,
+            Supplier<Map<ResourceLocation, SubBuilderInfo<C, ? extends B>>> types,
             String typeName
     ) {
         final SourceLine line = SourceLine.of(ctx);
-        final Info<C, ? extends B> builderInfo = types.get().get(typeId);
+        final SubBuilderInfo<C, ? extends B> builderInfo = types.get().get(typeId);
         if (builderInfo == null)
             throw Validations.exception(line, "Unknown " + typeName + " type: '" + typeId + "'");
         final B b = builderInfo.constructor().apply(constructorArg);
@@ -40,7 +40,7 @@ public abstract class SubBuilder<T> {
     protected abstract T create();
 
     @HideFromJS
-    public record Info<C, T>(
+    public record SubBuilderInfo<C, T>(
             TypeInfo type,
             Function<C, T> constructor
     ) {}

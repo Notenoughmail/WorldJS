@@ -170,7 +170,6 @@ public class WorldJSPlugin implements KubeJSPlugin {
         registry.register(GeodeConfigurationBuilder.GeodeBlocks.DEFAULT);
         registry.register(GeodeConfigurationBuilder.GeodeLayers.DEFAULT);
         registry.register(GeodeConfigurationBuilder.GeodeCrack.DEFAULT);
-        registry.register(DimensionTypeBuilder.DEFAULT_MONSTER_SETTINGS);
     }
 
     @Override

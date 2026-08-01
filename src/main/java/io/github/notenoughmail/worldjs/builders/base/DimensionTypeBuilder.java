@@ -7,6 +7,7 @@ import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
@@ -18,12 +19,7 @@ import java.util.OptionalLong;
 @ReturnsSelf
 public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
 
-    public static final DimensionType.MonsterSettings DEFAULT_MONSTER_SETTINGS = new DimensionType.MonsterSettings(
-            false,
-            true,
-            UniformInt.of(0, 7),
-            0
-    );
+    private static final IntProvider DEFAULT_MOB_TEST = UniformInt.of(0, 7);
 
     public transient OptionalLong fixedTime = OptionalLong.empty();
     public transient boolean
@@ -32,16 +28,21 @@ public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
             ultraWarm = false,
             natural = true,
             bedWorks = true,
-            respawnAnchorWorks = true;
+            respawnAnchorWorks = true,
+            piglinSafe = false,
+            hasRaids = true
+                    ;
     public transient double coordinateScale = 1D;
     public transient int
             minY = -64,
             height = 384,
-            logicalHeight = 384;
+            logicalHeight = 384,
+            monsterSpawnBlockLimit = 7
+                    ;
     public transient TagKey<Block> infiniburn = BlockTags.INFINIBURN_OVERWORLD;
     public transient ResourceLocation effectsLocation = BuiltinDimensionTypes.OVERWORLD_EFFECTS;
     public transient float ambientLight = 0F;
-    public transient DimensionType.MonsterSettings monsterSettings = DEFAULT_MONSTER_SETTINGS;
+    public transient IntProvider monsterSpawnLightTest = DEFAULT_MOB_TEST;
 
     public DimensionTypeBuilder(ResourceLocation id) {
         super(id);
@@ -139,11 +140,27 @@ public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
         return this;
     }
 
-    @Info("The monster settings of the dimension")
-    public DimensionTypeBuilder monsterSettings(DimensionType.MonsterSettings settings) {
-        Validations.assertRange(settings.monsterSpawnLightTest(), 0, 15, "monsterSettings.monsterSpawnLightTest");
-        Validations.assertRange(settings.monsterSpawnBlockLightLimit(), 0, 15, "monsterSettings.monsterSpawnBlockLightLimit");
-        monsterSettings = settings;
+    @Info("The weather-affected maximum light allowed when a mob spawns")
+    public DimensionTypeBuilder monsterSpawnLightTest(IntProvider test) {
+        monsterSpawnLightTest = Validations.assertRange(test, 0, 15, "monsterSpawnLightTest");
+        return this;
+    }
+
+    @Info("The maximum light allowed when a mob spawns")
+    public DimensionTypeBuilder monsterSpawnBlockLightLimit(int limit) {
+        monsterSpawnBlockLimit = Validations.assertRange(limit, 0, 15, "monsterSpawnBlockLightLimit");
+        return this;
+    }
+
+    @Info("Disables piglins and hoglins transforming into their zombified variants when in hte dimension")
+    public DimensionTypeBuilder safeForPiglins() {
+        piglinSafe = true;
+        return this;
+    }
+
+    @Info("Disable raids in the dimension")
+    public DimensionTypeBuilder noRaids() {
+        hasRaids = false;
         return this;
     }
 
@@ -172,7 +189,12 @@ public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
                 infiniburn,
                 effectsLocation,
                 ambientLight,
-                monsterSettings
+                new DimensionType.MonsterSettings(
+                        piglinSafe,
+                        hasRaids,
+                        monsterSpawnLightTest,
+                        monsterSpawnBlockLimit
+                )
         );
     }
 }
