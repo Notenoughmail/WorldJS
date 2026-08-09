@@ -19,7 +19,7 @@ public class OreConfigurationBuilder extends ConfiguredFeatureBuilder.WithFeatur
     public transient int size;
     public transient float discardChanceOnAirExposure;
 
-    public OreConfigurationBuilder(ResourceLocation id, Supplier<Feature<OreConfiguration>> feature) {
+    public OreConfigurationBuilder(ResourceLocation id, Supplier<? extends Feature<OreConfiguration>> feature) {
         super(id, feature);
         targets = new ArrayList<>();
     }

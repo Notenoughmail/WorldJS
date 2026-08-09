@@ -38,11 +38,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.DensityFunctions;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
+import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.material.Fluid;
@@ -183,10 +187,13 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
     public void addTypeAlias(AliasRegistrar r) {
         final TypeConverter converter = new TypeConverter();
         final Type primInt = converter.convertType(INT);
+        final Type primDoub = converter.convertType(DOUB);
+        final Type primFloat = converter.convertType(TypeInfo.PRIMITIVE_FLOAT);
         final Type json = converter.convertType(TypeInfo.of(JsonObject.class));
         final Type blockState = converter.convertType(BLOCK_STATE);
         final Type block = converter.convertType(BLOCK);
         final Type bool = converter.convertType(BOOL);
+        final Type conditionSource = converter.convertType(CONDITION_SOURCE);
 
         {
             // WeightedValue
@@ -212,9 +219,9 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             r.addInputAlias(clazz, literal("top"));
             r.addInputAlias(clazz, literal("-"));
             r.addInputAlias(clazz, literal("zero"));
-            r.addInputAlias(clazz, obj(b -> b.param("absolute", primInt)));
-            r.addInputAlias(clazz, obj(b -> b.param("above_bottom", primInt)));
-            r.addInputAlias(clazz, obj(b -> b.param("below_top", primInt)));
+            singleObj(r, clazz, "absolute", primInt);
+            singleObj(r, clazz, "above_bottom", primInt);
+            singleObj(r, clazz, "below_top", primInt);
             r.addInputAlias(clazz, json);
         }
 
@@ -238,9 +245,7 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
                      .param("max", va)
                      .param("plateau", true, primInt)
             );
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("weighted", converter.convertType(WEIGHTED_HEIGHT_PROVIDER_LIST))
-            ));
+            singleObj(r, clazz, "weighted", converter.convertType(WEIGHTED_HEIGHT_PROVIDER_LIST));
             obj(r, clazz, "biased", b ->
                     b.param("min", va)
                      .param("max", va)
@@ -253,27 +258,20 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
         {
             // BlockStateProvider
             final ClassPath clazz = path(BlockStateProvider.class);
+            final Type weight = converter.convertType(WEIGHTED_BLOCK_STATE_LIST);
 
             r.addInputAlias(clazz, block);
             r.addInputAlias(clazz, blockState);
-            r.addInputAlias(clazz, converter.convertType(WEIGHTED_BLOCK_STATE_LIST));
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("simple", blockState)
-            ));
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("block", blockState)
-            ));
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("rotate", block)
-            ));
+            r.addInputAlias(clazz, weight);
+            singleObj(r, clazz, "simple", blockState);
+            singleObj(r, clazz, "block", blockState);
+            singleObj(r, clazz, "rotate", block);
             obj(r, clazz, "randomized_int", b ->
                     b.param("property", Types.STRING)
                      .param("values", converter.convertType(INT_PROVIDER))
                      .param("source", converter.convertType(BLOCK_STATE_PROVIDER))
             );
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("weighted", converter.convertType(WEIGHTED_BLOCK_STATE_LIST))
-            ));
+            singleObj(r, clazz, "weighted", weight);
             r.addInputAlias(clazz, json);
         }
 
@@ -302,15 +300,9 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             r.addInputAlias(clazz, tag);
             r.addInputAlias(clazz, list);
             r.addInputAlias(clazz, bool);
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("not", converter.convertType(BLOCK_PREDICATE))
-            ));
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("all", list)
-            ));
-            r.addInputAlias(clazz, obj(b ->
-                    b.param("any", list)
-            ));
+            singleObj(r, clazz, "not", converter.convertType(BLOCK_PREDICATE));
+            singleObj(r, clazz, "all", list);
+            singleObj(r, clazz, "any", list);
             obj(r, clazz, "blocks", b ->
                     off.apply(b)
                        .param("match", converter.convertType(BLOCK_HOLDER_SET))
@@ -336,6 +328,192 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             obj(r, clazz, "no_fluid", off::apply);
             obj(r, clazz, "inside_world", off::apply);
             obj(r, clazz, "unobstructed", off::apply);
+        }
+
+        {
+            // SurfaceRules$RuleSource
+            final ClassPath clazz = path(SurfaceRules.RuleSource.class);
+            final Type list = converter.convertType(list(TypeInfo.of(SurfaceRules.RuleSource.class)));
+
+            r.addInputAlias(clazz, literal("badlands"));
+            r.addInputAlias(clazz, list);
+            anonObj(r, clazz, "badlands");
+            singleObj(r, clazz, "sequence", list);
+            singleObj(r, clazz, "block", blockState);
+            obj(r, clazz, "condition", b ->
+                    b.param("if_true", conditionSource)
+                     .param("then_run", Types.clazz(clazz))
+            );
+            r.addInputAlias(clazz, blockState);
+            r.addInputAlias(clazz, json);
+        }
+
+        {
+            // SurfaceRules$ConditionSource
+            final ClassPath clazz = path(SurfaceRules.ConditionSource.class);
+            final Type biomeList = converter.convertType(list(BIOME_RES_KEY));
+            final Type verticalAnchor = converter.convertType(VERTICAL_ANCHOR);
+
+            r.addInputAlias(clazz, literal("above_preliminary_surface"));
+            r.addInputAlias(clazz, literal("hole"));
+            r.addInputAlias(clazz, literal("temperature"));
+            r.addInputAlias(clazz, literal("steep"));
+            r.addInputAlias(clazz, biomeList);
+            singleObj(r, clazz, "biome", biomeList);
+            obj(r, clazz, "noise_threshold", b ->
+                    b.param("noise", converter.convertType(NOISE_PARAMS_RES_KEY))
+                     .param("min_threshold", primDoub)
+                     .param("max_threshold", true, primDoub)
+            );
+            obj(r, clazz, "vertical_gradient", b ->
+                    b.param("random_name", converter.convertType(TypeInfo.of(ResourceLocation.class)))
+                     .param("true_at_and_below", verticalAnchor)
+                     .param("false_at_and_above", verticalAnchor)
+            );
+            obj(r, clazz, "y_above", b ->
+                    b.param("add_stone_depth", true, bool)
+                     .param("anchor", verticalAnchor)
+                     .param("surface_depth_multiplier", primInt)
+            );
+            obj(r, clazz, "water", b ->
+                    b.param("offset", primInt)
+                     .param("surface_depth_multiplier", primInt)
+                     .param("add_stone_depth", true, bool)
+            );
+            anonObj(r, clazz, "temperature");
+            anonObj(r, clazz, "steep");
+            anonObj(r, clazz, "hole");
+            anonObj(r, clazz, "above_preliminary_surface");
+            singleObj(r, clazz, "not", conditionSource);
+            obj(r, clazz, "stone_depth", b ->
+                    b.param("offset", primInt)
+                     .param("add_surface_depth", true, bool)
+                     .param("secondary_depth_range", primInt)
+                     .param("surface_type", converter.convertType(TypeInfo.of(CaveSurface.class)))
+            );
+            r.addInputAlias(clazz, json);
+        }
+
+        {
+            // DensityFunction
+            final ClassPath clazz = path(DensityFunction.class);
+            final Type densityFunction = converter.convertType(DENSITY_FUNCTION);
+            final Type noiseParams = converter.convertType(TypeInfo.of(Holder.Reference.class).withParams(NOISE_PARAMS));
+            final Type ref = converter.convertType(TypeInfo.of(Holder.Reference.class).withParams(DENSITY_FUNCTION));
+
+            final ClassPath splineClazz = clazz.withSuffix("$Spline");
+            final Type spline = Types.clazz(splineClazz);
+
+            r.addInputAlias(clazz, ref);
+            r.addInputAlias(clazz, primDoub);
+            r.addInputAlias(clazz, converter.convertType(resourceKey(DensityFunction.class)));
+            anonObj(r, clazz, "blend_alpha");
+            anonObj(r, clazz, "blend_offset");
+            anonObj(r, clazz, "beardifier");
+            obj(r, clazz, "old_blend_noise", b ->
+                    b.param("xz_scale", primDoub)
+                     .param("y_scale", primDoub)
+                     .param("xz_factor", primDoub)
+                     .param("y_factor", primDoub)
+                     .param("smear_scale_multiplier", primDoub)
+            );
+            singleObj(r, clazz, "interpolated", densityFunction);
+            singleObj(r, clazz, "flat_cache", densityFunction);
+            singleObj(r, clazz, "cache_2d", densityFunction);
+            singleObj(r, clazz, "cache_once", densityFunction);
+            singleObj(r, clazz, "cache_all_in_cell", densityFunction);
+            obj(r, clazz, "noise", b ->
+                    b.param("noise", noiseParams)
+                     .param("xz_scale", primDoub)
+                     .param("y_scale", primDoub)
+            );
+            anonObj(r, clazz, "end_islands");
+            obj(r, clazz, "weird_scaled_sampler", b ->
+                    b.param("input", densityFunction)
+                     .param("noise", noiseParams)
+                     .param("rarity_value_mapper", converter.convertType(TypeInfo.of(DensityFunctions.WeirdScaledSampler.RarityValueMapper.class)))
+            );
+            obj(r, clazz, "shifted_noise", b ->
+                    b.param("shift_x", densityFunction)
+                     .param("shift_y", densityFunction)
+                     .param("shift_z", densityFunction)
+                     .param("xz_scale", primDoub)
+                     .param("y_scale", primDoub)
+                     .param("noise", noiseParams)
+            );
+            obj(r, clazz, "range_choice", b ->
+                    b.param("input", densityFunction)
+                     .param("min_inclusive", primDoub)
+                     .param("max_inclusive", primDoub)
+                     .param("when_in_range", densityFunction)
+                     .param("when_out_of_range", densityFunction)
+            );
+            singleObj(r, clazz, "shift_a", noiseParams);
+            singleObj(r, clazz, "shift_b", noiseParams);
+            singleObj(r, clazz, "shift", noiseParams);
+            singleObj(r, clazz, "blend_density", densityFunction);
+            obj(r, clazz, "clamp", b ->
+                    b.param("input", densityFunction)
+                     .param("min_value", primDoub)
+                     .param("max_value", primDoub)
+            );
+            singleObj(r, clazz, "abs", densityFunction);
+            singleObj(r, clazz, "square", densityFunction);
+            singleObj(r, clazz, "cube", densityFunction);
+            singleObj(r, clazz, "half_negative", densityFunction);
+            singleObj(r, clazz, "quarter_negative", densityFunction);
+            singleObj(r, clazz, "squeeze", densityFunction);
+            obj(r, clazz, "add", b ->
+                    b.param("first", densityFunction)
+                     .param("second", densityFunction)
+            );
+            obj(r, clazz, "mul", b ->
+                    b.param("first", densityFunction)
+                      .param("second", densityFunction)
+            );
+            obj(r, clazz, "min", b ->
+                    b.param("first", densityFunction)
+                     .param("second", densityFunction)
+            );
+            obj(r, clazz, "max", b ->
+                    b.param("first", densityFunction)
+                     .param("second", densityFunction)
+            );
+            singleObj(r, clazz, "constant", primDoub);
+            singleObj(r, clazz, "spline", spline);
+            obj(r, clazz, "y_clamped_gradient", b ->
+                    b.param("from_y", primInt)
+                     .param("to_y", primInt)
+                     .param("from_value", primDoub)
+                     .param("to_value", primDoub)
+            );
+            r.addInputAlias(clazz, json);
+
+            {
+                // DensityFunction"$Spline" & DensityFunction"$Spline$Point"
+
+                final ClassPath pointClazz = splineClazz.withSuffix("$Point");
+
+                r.addInputAlias(splineClazz, primFloat);
+                r.addInputAlias(splineClazz, obj(b ->
+                        b.param("coordinate", ref)
+                         .param("value_transformer", true, converter.convertType(FLOAT_2_FLOAT))
+                         .param("points", Types.arrayOf(pointClazz))
+                ));
+
+                r.addInputAlias(pointClazz, obj(b ->
+                        b.param("location", primFloat)
+                         .param("value", primFloat)
+                         .param("derivative", primFloat)
+                ));
+                r.addInputAlias(pointClazz, obj(b ->
+                        b.param("location", primFloat)
+                         .param("value", spline)
+                ));
+
+                Documents.INSTANCE.addDocument(splineClazz, Members.clazz(splineClazz).build());
+                Documents.INSTANCE.addDocument(pointClazz, Members.clazz(pointClazz).build());
+            }
         }
 
         r.addInputAlias(ServerRegistryHolderSet.class, Types.clazz(HolderSet.class).withParams(Types.raw("R")));
@@ -375,8 +553,7 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             f.setAccessible(true);
             return f;
         } catch (Throwable t) {
-            WorldJS.LOGGER.error("Cannot make method comments accessible!", t);
-            throw new RuntimeException(t);
+            throw WorldJS.irrecoverableError("Cannot make method comments accessible!", t);
         }
     });
 
@@ -387,8 +564,7 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
                 try {
                     comments.addAll(Cast.to(COMMENTABLE_CODE_COMMENTS.get(method)));
                 } catch (Throwable t) {
-                    WorldJS.LOGGER.error("Cannot get method comments of %s".formatted(method), t);
-                    throw new RuntimeException(t);
+                    throw WorldJS.irrecoverableError("Cannot get method comments of %s".formatted(method), t);
                 }
                 return true;
             }
@@ -416,8 +592,16 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
         return Types.object(builder);
     }
 
+    private static void singleObj(AliasRegistrar r, ClassPath clazz, String name, Type type) {
+        r.addInputAlias(clazz, obj(b -> b.param(name, type)));
+    }
+
     private static void obj(AliasRegistrar r, ClassPath clazz, String name, Consumer<ObjectType.Builder> builder) {
-        r.addInputAlias(clazz, obj(b -> b.param(name, obj(builder))));
+        singleObj(r, clazz, name, obj(builder));
+    }
+
+    private static void anonObj(AliasRegistrar r, ClassPath clazz, String name) {
+        singleObj(r, clazz, name, Types.ANY);
     }
 
     private static ClassPath path(Class<?> clazz) {

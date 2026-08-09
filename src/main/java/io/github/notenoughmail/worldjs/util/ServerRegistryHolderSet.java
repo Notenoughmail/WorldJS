@@ -46,17 +46,16 @@ public interface ServerRegistryHolderSet<R> {
     @HideFromJS
     default HolderSet<R> convertWithValidation(String name, Function<String, KubeRuntimeException> messageWrapper) {
         final HolderSet<R> set = convert();
-        if (set instanceof HolderSet.Direct<R> dir && dir.size() == 0)
-            throw messageWrapper.apply("'" + name + "' should not be empty!");
+        if (this != EMPTY) {
+            if (set instanceof HolderSet.Direct<R> dir && dir.size() == 0)
+                throw messageWrapper.apply("'" + name + "' should not be empty!");
+        }
         return set;
     }
 
     @HideFromJS
     default HolderSet<R> convertWithValidation(String name, SourceLine source) {
-        final HolderSet<R> set = convert();
-        if (set instanceof HolderSet.Direct<R> dir && dir.size() == 0)
-            throw Validations.exception(source, "'" + name + "' should not be empty!");
-        return set;
+        return convertWithValidation(name, s -> Validations.exception(source, s));
     }
 
     @ApiStatus.Internal

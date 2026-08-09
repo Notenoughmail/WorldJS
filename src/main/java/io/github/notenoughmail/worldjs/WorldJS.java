@@ -13,6 +13,7 @@ import io.github.notenoughmail.worldjs.builders.cg.DebugChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.builders.cg.FlatChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.builders.cg.NoiseBasedChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.types.features.WeightedRandomSelectorFeature;
+import io.github.notenoughmail.worldjs.util.Validations;
 import io.github.notenoughmail.worldjs.util.event.BiomeSourceTypeRegisterEvent;
 import io.github.notenoughmail.worldjs.util.event.ChunkGeneratorTypeRegisterEvent;
 import io.github.notenoughmail.worldjs.util.event.PlacedFeatureModifierEvent;
@@ -68,6 +69,11 @@ public class WorldJS {
         }
     }
 
+    public static RuntimeException irrecoverableError(String msg, Throwable t) {
+        LOGGER.error(msg, t);
+        return new RuntimeException(t);
+    }
+
     private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, MODID);
 
     public static final DeferredHolder<Feature<?>, WeightedRandomSelectorFeature> WEIGHTED_RANDOM_SELECTOR = FEATURES.register("weighted_random_selector", () -> new WeightedRandomSelectorFeature(WeightedRandomSelectorFeature.Configuration.CODEC));
@@ -113,11 +119,9 @@ public class WorldJS {
                         "count",
                         INT_PROVIDER,
                         "How many times the placed feature should be placed",
-                        i -> {
-                            if (i.getMinValue() < 0 || i.getMaxValue() > 256)
-                                throw new IllegalArgumentException("'count' must be in the range [0, 256]");
-                            return CountPlacement.of(i);
-                        },
+                        i -> CountPlacement.of(
+                                Validations.assertRange(i, 0, 256, "count")
+                        ),
                         "Add a 'minecraft:count' placement modifier"
                 )
                 .registerSingleArg(
@@ -133,11 +137,9 @@ public class WorldJS {
                         "chance",
                         INT,
                         "The chance the feature will successfully place as `1/chance`",
-                        i -> {
-                            if (i < 1)
-                                throw new IllegalArgumentException("'chance' must be positive");
-                            return RarityFilter.onAverageOnceEvery(i);
-                        },
+                        i -> RarityFilter.onAverageOnceEvery(
+                                Validations.assertPositive(i, "chance")
+                        ),
                         "Add a 'minecraft:rarity_filter' placement filter"
                 )
                 .registerSingleArg(
@@ -194,32 +196,26 @@ public class WorldJS {
                         "randomOffset",
                         event.arg(hs = event.singleArg("xzSpread", INT_PROVIDER, "The horizontal spread"))
                                 .arg(vs = event.singleArg("ySpread", INT_PROVIDER, "The vertical spread")),
-                        a -> {
-                            final IntProvider xz = intProvider(a[0]), y = intProvider(a[1]);
-                            if (xz.getMaxValue() < -16 || y.getMinValue() < -16 || xz.getMaxValue() > 16 || y.getMaxValue() > 16)
-                                throw new IllegalArgumentException("'xzSpread' and 'ySpread' must be in range [-16, 16]");
-                            return RandomOffsetPlacement.of(xz, y);
-                        },
+                        a -> RandomOffsetPlacement.of(
+                                Validations.assertRange(intProvider(a[0]), -16, 16, "xzSpread"),
+                                Validations.assertRange(intProvider(a[1]), -16, 16, "ySpread")
+                        ),
                         "Add a 'minecraft:random_offset' placement modifier"
                 )
                 .<IntProvider>registerSingleArg(
                         "verticalRandomOffset",
                         vs,
-                        i -> {
-                            if (i.getMinValue() < -16 || i.getMaxValue() > 16)
-                                throw new IllegalArgumentException("'ySpread' must be in the range [-16, 16]");
-                            return RandomOffsetPlacement.vertical(i);
-                        },
+                        i -> RandomOffsetPlacement.vertical(
+                                Validations.assertRange(i, -16, 16, "ySpread")
+                        ),
                         "Add a purely vertical 'minecraft:random_offset' placement modifier"
                 )
                 .<IntProvider>registerSingleArg(
                         "horizontalRandomOffset",
                         hs,
-                        i -> {
-                            if (i.getMinValue() < -16 || i.getMaxValue() > 16)
-                                throw new IllegalArgumentException("'xzSpread' must be in the range [-16, 16]");
-                            return RandomOffsetPlacement.horizontal(i);
-                        },
+                        i -> RandomOffsetPlacement.horizontal(
+                                Validations.assertRange(i, -16, 16, "xzSpread")
+                        ),
                         "Add a purely horizontal 'minecraft:random_offset' placement modifier"
                 )
                 .<IntProvider>registerSingleArg(
@@ -227,11 +223,9 @@ public class WorldJS {
                         "count",
                         INT_PROVIDER,
                         "The number of times to place per layer",
-                        i -> {
-                            if (i.getMinValue() < 0 || i.getMaxValue() > 256)
-                                throw new IllegalArgumentException("'count' must be in the range [0, 256]");
-                            return CountOnEveryLayerPlacement.of(i);
-                        },
+                        i -> CountOnEveryLayerPlacement.of(
+                                Validations.assertRange(i, 0, 256, "count")
+                        ),
                         "Add a 'minecraft:count_on_every_layer' placement modifier"
                 )
                 .register(
@@ -240,32 +234,22 @@ public class WorldJS {
                                 .arg(tc = event.singleArg("targetCondition", BLOCK_PREDICATE, "the condition for a valid block"))
                                 .arg("allowedSearchCondition", BLOCK_PREDICATE, "the condition that steps in the scan must pass")
                                 .arg(ms = event.singleArg("maxSteps", INT, "The maximum number of blocks, in the range [1, 32], out from the original position to check")),
-                        a -> {
-                            final int step = i(a[3]);
-                            if (step < 1 || step > 32)
-                                throw new IllegalArgumentException("'maxSteps' must be in the range [1, 32]");
-                            return EnvironmentScanPlacement.scanningFor(
-                                    Cast.to(a[0]),
-                                    Cast.to(a[1]),
-                                    Cast.to(a[2]),
-                                    step
-                            );
-                        },
+                        a -> EnvironmentScanPlacement.scanningFor(
+                                Cast.to(a[0]),
+                                Cast.to(a[1]),
+                                Cast.to(a[2]),
+                                Validations.assertRange(i(a[3]), 1, 32, "maxSteps")
+                        ),
                         "Add a 'minecraft:environment_scan' placement modifier"
                 )
                 .register(
                         "environmentScan",
                         event.arg(ds).arg(tc).arg(ms),
-                        a -> {
-                            final int step = i(a[2]);
-                            if (step < 1 || step > 32)
-                                throw new IllegalArgumentException("'maxSteps' must be in the range [1, 32]");
-                            return EnvironmentScanPlacement.scanningFor(
-                                    Cast.to(a[0]),
-                                    Cast.to(a[1]),
-                                    step
-                            );
-                        },
+                        a -> EnvironmentScanPlacement.scanningFor(
+                                Cast.to(a[0]),
+                                Cast.to(a[1]),
+                                Validations.assertRange(i(a[2]), 1, 32, "maxSteps")
+                        ),
                         "Add a 'minecraft:environment_scan' placement modifier"
                 )
                 .register(

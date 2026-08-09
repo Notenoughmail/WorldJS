@@ -18,7 +18,7 @@ public class RandomPatchConfigurationBuilder extends ConfiguredFeatureBuilder.Wi
     public transient int tries, xzSpread, ySpread;
     public transient Holder.Reference<PlacedFeature> feature;
 
-    public RandomPatchConfigurationBuilder(ResourceLocation id, Supplier<Feature<RandomPatchConfiguration>> feature) {
+    public RandomPatchConfigurationBuilder(ResourceLocation id, Supplier<? extends Feature<RandomPatchConfiguration>> feature) {
         super(id, feature);
         tries = 128;
         xzSpread = 7;

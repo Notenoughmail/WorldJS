@@ -9,10 +9,7 @@ import dev.latvian.mods.kubejs.registry.ServerRegistryRegistry;
 import dev.latvian.mods.kubejs.script.RecordDefaultsRegistry;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import io.github.notenoughmail.worldjs.builders.base.ConfiguredFeatureBuilder;
-import io.github.notenoughmail.worldjs.builders.base.DimensionTypeBuilder;
-import io.github.notenoughmail.worldjs.builders.base.PlacedFeatureBuilder;
-import io.github.notenoughmail.worldjs.builders.base.WorldPresetBuilder;
+import io.github.notenoughmail.worldjs.builders.base.*;
 import io.github.notenoughmail.worldjs.builders.bm.*;
 import io.github.notenoughmail.worldjs.builders.cf.*;
 import io.github.notenoughmail.worldjs.types.features.KubeFeature;
@@ -21,6 +18,8 @@ import io.github.notenoughmail.worldjs.util.WeightedValue;
 import io.github.notenoughmail.worldjs.util.Wrappers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -126,6 +125,8 @@ public class WorldJSPlugin implements KubeJSPlugin {
         });
         registry.addDefault(Registries.DIMENSION_TYPE, DimensionTypeBuilder.class, DimensionTypeBuilder::new);
         registry.addDefault(Registries.WORLD_PRESET, WorldPresetBuilder.class, WorldPresetBuilder::new);
+        registry.addDefault(Registries.NOISE_SETTINGS, NoiseGeneratorSettingsBuilder.class, NoiseGeneratorSettingsBuilder::new);
+        registry.addDefault(Registries.BIOME, BiomeBuilder.class, BiomeBuilder::new);
     }
 
     private static <C, B extends BuilderBase<? extends C>> void add(BuilderTypeRegistry.Callback<C> callback, ResourceLocation id, Class<B> builderType, BuilderFactory factory) {
@@ -155,6 +156,9 @@ public class WorldJSPlugin implements KubeJSPlugin {
         registry.register(VerticalAnchor.class, Wrappers::verticalAnchor);
         registry.register(HeightProvider.class, Wrappers::heightProvider);
         registry.register(BlockPredicate.class, Wrappers::blockPredicate);
+        registry.register(SurfaceRules.RuleSource.class, Wrappers::ruleSource);
+        registry.register(SurfaceRules.ConditionSource.class, Wrappers::conditionSource);
+        registry.register(DensityFunction.class, Wrappers::densityFunction);
         registry.register(ServerRegistryHolderSet.class, ServerRegistryHolderSet::wrap);
         registry.registerCodec(TrunkPlacer.class, TrunkPlacer.CODEC);
         registry.registerCodec(FoliagePlacer.class, FoliagePlacer.CODEC);

@@ -2,6 +2,7 @@ package io.github.notenoughmail.worldjs.util;
 
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -28,19 +29,31 @@ public interface Validations {
 
     static int assertRange(int val, int min, int max, String name) {
         if (val < min || val > max)
-            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
+            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "] but was " + val);
+        return val;
+    }
+
+    static int assertNotGreaterThan(int check, int against, String checkName, @Nullable String againstName, SourceLine source) {
+        if (check > against)
+            throw exception(source, "'%s' cannot be greater than '%s'".formatted(checkName, againstName == null ? against : againstName));
+        return check;
+    }
+
+    static int assertIsMultipleOf(int val, int multiple, String name, SourceLine source) {
+        if (val % multiple != 0)
+            throw exception(source, "'%s' must be a multiple of %s!".formatted(name, multiple));
         return val;
     }
 
     static float assertRange(float val, float min, float max, String name) {
         if (val < min || val > max)
-            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f] but was %.2f".formatted(name, min, max, val));
         return val;
     }
 
     static double assertRange(double val, double min, double max, String name) {
         if (val < min || val > max)
-            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f] but was %.2f".formatted(name, min, max, val));
         return val;
     }
 
@@ -54,7 +67,7 @@ public interface Validations {
 
     static IntProvider assertRange(IntProvider provider, int min, int max, String name) {
         if (provider.getMinValue() < min || provider.getMaxValue() > max)
-            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "]");
+            throw new IllegalArgumentException("'" + name + "' must be in the range [" + min + ", " + max + "] but was [" + provider.getMinValue() + ", " + provider.getMaxValue() + "]");
         return provider;
     }
 
@@ -72,7 +85,7 @@ public interface Validations {
 
     static FloatProvider assertRange(FloatProvider provider, float min, float max, String name) {
         if (provider.getMinValue() < min || provider.getMaxValue() > max)
-            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f]".formatted(name, min, max));
+            throw new IllegalArgumentException("'%s' must be in the range [%.2f, %.2f] but was [%.2f, %.2f]".formatted(name, min, max, provider.getMinValue(), provider.getMaxValue()));
         return provider;
     }
 
@@ -104,5 +117,9 @@ public interface Validations {
 
     static KubeRuntimeException exception(SourceLine source, String message) {
         return new KubeRuntimeException(message).source(source);
+    }
+
+    static KubeRuntimeException exception(Context ctx, String message) {
+        return exception(SourceLine.of(ctx), message);
     }
 }

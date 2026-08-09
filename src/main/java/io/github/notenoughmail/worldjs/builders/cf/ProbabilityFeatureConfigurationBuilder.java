@@ -15,7 +15,7 @@ public class ProbabilityFeatureConfigurationBuilder extends ConfiguredFeatureBui
 
     public transient float probability;
 
-    public ProbabilityFeatureConfigurationBuilder(ResourceLocation id, Supplier<Feature<ProbabilityFeatureConfiguration>> feature) {
+    public ProbabilityFeatureConfigurationBuilder(ResourceLocation id, Supplier<? extends Feature<ProbabilityFeatureConfiguration>> feature) {
         super(id, feature);
         probability = 1f;
     }

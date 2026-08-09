@@ -14,11 +14,15 @@ import java.util.List;
 
 public class ClimateParameterListBuilder {
 
+    public static Entry entry(Holder<Biome> biome) {
+        return new Entry(biome, new MutableParamPoint());
+    }
+
     private final List<Entry> entries = new ArrayList<>();
 
     @Info("Add and subsequently modify a climate parameter entry for the given biome")
     public Entry forBiome(Holder.Reference<Biome> biome) {
-        final Entry entry = new Entry(biome, new MutableParamPoint());
+        final Entry entry = entry(biome);
         entries.add(entry);
         return entry;
     }
@@ -102,7 +106,7 @@ public class ClimateParameterListBuilder {
     }
 
     @HideFromJS
-    static final class MutableParamPoint {
+    public static final class MutableParamPoint {
 
         static final Climate.Parameter EMPTY = new Climate.Parameter(0L, 0L);
         Climate.Parameter
@@ -114,7 +118,7 @@ public class ClimateParameterListBuilder {
                 weirdness = EMPTY;
         long offset = 0L;
 
-        Climate.ParameterPoint toPoint() {
+        public Climate.ParameterPoint toPoint() {
             return new Climate.ParameterPoint(
                     temperature,
                     humidity,

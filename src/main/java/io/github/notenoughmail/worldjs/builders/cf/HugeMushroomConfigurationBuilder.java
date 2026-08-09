@@ -17,7 +17,7 @@ public class HugeMushroomConfigurationBuilder extends ConfiguredFeatureBuilder.W
     public transient BlockStateProvider stem;
     public transient int foliageRadius;
 
-    public HugeMushroomConfigurationBuilder(ResourceLocation id, Supplier<Feature<HugeMushroomFeatureConfiguration>> feature) {
+    public HugeMushroomConfigurationBuilder(ResourceLocation id, Supplier<? extends Feature<HugeMushroomFeatureConfiguration>> feature) {
         super(id, feature);
         foliageRadius = 2;
     }

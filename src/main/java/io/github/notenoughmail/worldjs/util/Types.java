@@ -1,18 +1,25 @@
 package io.github.notenoughmail.worldjs.util;
 
 import dev.latvian.mods.rhino.type.TypeInfo;
+import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
+import net.minecraft.world.level.levelgen.placement.CaveSurface;
+import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.material.Fluid;
 
 public interface Types {
@@ -31,6 +38,13 @@ public interface Types {
     TypeInfo BLOCK_HOLDER_SET = holderSet(BLOCK);
     TypeInfo FLUID_HOLDER_SET = holderSet(TypeInfo.of(Fluid.class));
     TypeInfo BLOCK_TAG = TypeInfo.of(TagKey.class).withParams(BLOCK);
+    TypeInfo CONDITION_SOURCE = TypeInfo.of(SurfaceRules.ConditionSource.class);
+    TypeInfo RESOURCE_KEY = TypeInfo.of(ResourceKey.class);
+    TypeInfo BIOME_RES_KEY = resourceKey(Biome.class);
+    TypeInfo NOISE_PARAMS = TypeInfo.of(NormalNoise.NoiseParameters.class);
+    TypeInfo NOISE_PARAMS_RES_KEY = RESOURCE_KEY.withParams(NOISE_PARAMS);
+    TypeInfo DENSITY_FUNCTION = TypeInfo.of(DensityFunction.class);
+    TypeInfo FLOAT_2_FLOAT = TypeInfo.of(Float2FloatFunction.class);
 
     TypeInfo DIRECTION = TypeInfo.of(Direction.class);
     TypeInfo HEIGHTMAP = TypeInfo.of(Heightmap.Types.class);
@@ -42,11 +56,15 @@ public interface Types {
 
     TypeInfo PARSE_MAP = TypeInfo.RAW_MAP.withParams(STR, TypeInfo.OBJECT);
 
-    private static TypeInfo list(TypeInfo param) {
+    static TypeInfo list(TypeInfo param) {
         return TypeInfo.RAW_LIST.withParams(param);
     }
 
-    private static TypeInfo holderSet(TypeInfo param) {
+    static TypeInfo holderSet(TypeInfo param) {
         return HOLDER_SET.withParams(param);
+    }
+
+    static TypeInfo resourceKey(Class<?> type) {
+        return RESOURCE_KEY.withParams(TypeInfo.of(type));
     }
 }

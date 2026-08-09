@@ -98,20 +98,18 @@ public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
 
     @Info("The minimum height at which blocks can exist in the dimension, must be a multiple of 16 and in the range [-2032, 2031]")
     public DimensionTypeBuilder minY(int minY) {
-        this.minY = Validations.validate(
+        this.minY = Validations.assertIsMultipleOf(
                 Validations.assertRange(minY, DimensionType.MIN_Y, DimensionType.MAX_Y, "minY"),
-                i -> i % 16 == 0 ? null : "'minY' must be a multiple of 16!",
-                sourceLine
+                16, "minY", sourceLine
         );
         return this;
     }
 
     @Info("The total height in which blocks can exist within the dimension, must be a multiple of 16 and in the range [16, 4064]. The maximum build height (minY + height -1) cannot be greater than 2031")
     public DimensionTypeBuilder height(int height) {
-        this.height = Validations.validate(
+        this.height = Validations.assertIsMultipleOf(
                 Validations.assertRange(height, 16, DimensionType.Y_SIZE, "height"),
-                i -> i % 16 == 0 ? null : "'height' must be a multiple of 16!",
-                sourceLine
+                16, "height", sourceLine
         );
         return this;
     }
@@ -181,9 +179,11 @@ public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
                         sourceLine
                 ),
                 height,
-                Validations.validate(
+                Validations.assertNotGreaterThan(
                         logicalHeight,
-                        h -> h > height ? "'logicalHeight' cannot be higher than 'height'" : null,
+                        height,
+                        "logicalHeight",
+                        "height",
                         sourceLine
                 ),
                 infiniburn,

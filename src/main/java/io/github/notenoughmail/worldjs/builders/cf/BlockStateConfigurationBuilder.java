@@ -16,7 +16,7 @@ public class BlockStateConfigurationBuilder extends ConfiguredFeatureBuilder.Wit
 
     public transient BlockState state;
 
-    public BlockStateConfigurationBuilder(ResourceLocation id, Supplier<Feature<BlockStateConfiguration>> feature) {
+    public BlockStateConfigurationBuilder(ResourceLocation id, Supplier<? extends Feature<BlockStateConfiguration>> feature) {
         super(id, feature);
         state = Blocks.AIR.defaultBlockState();
     }

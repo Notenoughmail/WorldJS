@@ -31,7 +31,7 @@ public class VegetationPatchConfigurationBuilder extends ConfiguredFeatureBuilde
     public transient IntProvider xzRadius;
     public transient float extraEdgeColumnChance;
 
-    public VegetationPatchConfigurationBuilder(ResourceLocation id, Supplier<Feature<VegetationPatchConfiguration>> feature) {
+    public VegetationPatchConfigurationBuilder(ResourceLocation id, Supplier<? extends Feature<VegetationPatchConfiguration>> feature) {
         super(id, feature);
         surface = CaveSurface.FLOOR;
         extraBottomBlockChance = 0;
