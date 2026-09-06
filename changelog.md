@@ -1,4 +1,4 @@
-# 1.1.0 (W.I.P.)
+# 1.1.0
 - Add builders for dimension types, world presets, biomes, and noise generator settings
 
 # 1.0.1
