@@ -5,6 +5,10 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.logging.LogUtils;
 import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.util.Cast;
+import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
+import io.github.notenoughmail.worldjs.builders.base.ChunkGeneratorBuilder;
+import io.github.notenoughmail.worldjs.builders.base.SubBuilder;
+import io.github.notenoughmail.worldjs.builders.base.WorldPresetBuilder;
 import io.github.notenoughmail.worldjs.builders.bs.CheckerboardBiomeSourceBuilder;
 import io.github.notenoughmail.worldjs.builders.bs.EndBiomeSourceBuilder;
 import io.github.notenoughmail.worldjs.builders.bs.FixedBiomeSourceBuilder;
@@ -13,6 +17,7 @@ import io.github.notenoughmail.worldjs.builders.cg.DebugChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.builders.cg.FlatChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.builders.cg.NoiseBasedChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.types.features.WeightedRandomSelectorFeature;
+import io.github.notenoughmail.worldjs.util.Types;
 import io.github.notenoughmail.worldjs.util.Validations;
 import io.github.notenoughmail.worldjs.util.event.BiomeSourceTypeRegisterEvent;
 import io.github.notenoughmail.worldjs.util.event.ChunkGeneratorTypeRegisterEvent;
@@ -21,8 +26,13 @@ import io.github.notenoughmail.worldjs.util.synmethod.Args;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -78,6 +88,30 @@ public class WorldJS {
 
     public static final DeferredHolder<Feature<?>, WeightedRandomSelectorFeature> WEIGHTED_RANDOM_SELECTOR = FEATURES.register("weighted_random_selector", () -> new WeightedRandomSelectorFeature(WeightedRandomSelectorFeature.Configuration.CODEC));
 
+    public static final SubBuilder.SubBuilderMap<ResourceKey<LevelStem>, ChunkGeneratorBuilder<?>, ChunkGenerator> CHUNK_GENERATOR_TYPES = SubBuilder.registerBuilders(
+            WorldPresetBuilder.class,
+            "withDimension",
+            b -> {
+                b.param("id", Types.resourceKey(LevelStem.class));
+                b.param("dimensionType", Types.refHolder(DimensionType.class));
+                b.idParam("generatorType");
+                b.consumerParam("generatorBuilder");
+            },
+            ChunkGeneratorTypeRegisterEvent::new,
+            "chunk generator"
+    );
+
+    public static final SubBuilder.SubBuilderMap<ResourceLocation, BiomeSourceBuilder<?>, BiomeSource> BIOME_SOURCE_TYPES = SubBuilder.registerBuilders(
+            NoiseBasedChunkGeneratorBuilder.class,
+            "biomeSource",
+            b -> {
+                b.idParam("type");
+                b.consumerParam("biomeSourceBuilder");
+            },
+            BiomeSourceTypeRegisterEvent::new,
+            "biome source"
+    );
+
     public WorldJS(IEventBus modBus) {
         NeoForge.EVENT_BUS.addListener(this::addVanillaPlacementModifiers);
         NeoForge.EVENT_BUS.addListener(this::addVanillaChunkGeneratorTypes);
@@ -86,7 +120,9 @@ public class WorldJS {
         FEATURES.register(modBus);
     }
 
-    public static <V, E extends Event> Supplier<Map<ResourceLocation, V>> eventMap(Function<BiConsumer<ResourceLocation, V>, E> eventConstructor) {
+    public static <V, E extends Event> Supplier<Map<ResourceLocation, V>> eventMap(
+            Function<BiConsumer<ResourceLocation, V>, E> eventConstructor
+    ) {
         return Suppliers.memoize(() ->
                 Util.make(
                         ImmutableMap.<ResourceLocation, V>builder(),

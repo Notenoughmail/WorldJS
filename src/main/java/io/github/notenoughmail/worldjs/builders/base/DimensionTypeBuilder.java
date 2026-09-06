@@ -150,7 +150,7 @@ public class DimensionTypeBuilder extends BuilderBase<DimensionType> {
         return this;
     }
 
-    @Info("Disables piglins and hoglins transforming into their zombified variants when in hte dimension")
+    @Info("Disables piglins and hoglins transforming into their zombified variants when in the dimension")
     public DimensionTypeBuilder safeForPiglins() {
         piglinSafe = true;
         return this;

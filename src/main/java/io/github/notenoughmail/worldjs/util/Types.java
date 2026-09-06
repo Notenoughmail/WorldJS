@@ -3,6 +3,7 @@ package io.github.notenoughmail.worldjs.util;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceKey;
@@ -18,9 +19,10 @@ import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
-import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.material.Fluid;
+
+import java.util.function.Consumer;
 
 public interface Types {
 
@@ -35,6 +37,7 @@ public interface Types {
     TypeInfo LIST_BLOCK_PREDICATE = list(BLOCK_PREDICATE);
     TypeInfo VEC3I = TypeInfo.of(Vec3i.class);
     TypeInfo HOLDER_SET = TypeInfo.of(HolderSet.class);
+    TypeInfo REF_HOLDER = TypeInfo.of(Holder.Reference.class);
     TypeInfo BLOCK_HOLDER_SET = holderSet(BLOCK);
     TypeInfo FLUID_HOLDER_SET = holderSet(TypeInfo.of(Fluid.class));
     TypeInfo BLOCK_TAG = TypeInfo.of(TagKey.class).withParams(BLOCK);
@@ -55,6 +58,7 @@ public interface Types {
     TypeInfo STR = TypeInfo.STRING;
 
     TypeInfo PARSE_MAP = TypeInfo.RAW_MAP.withParams(STR, TypeInfo.OBJECT);
+    TypeInfo CONSUMER = TypeInfo.of(Consumer.class);
 
     static TypeInfo list(TypeInfo param) {
         return TypeInfo.RAW_LIST.withParams(param);
@@ -66,5 +70,13 @@ public interface Types {
 
     static TypeInfo resourceKey(Class<?> type) {
         return RESOURCE_KEY.withParams(TypeInfo.of(type));
+    }
+
+    static TypeInfo refHolder(Class<?> type) {
+        return REF_HOLDER.withParams(TypeInfo.of(type));
+    }
+
+    static TypeInfo consumer(TypeInfo type) {
+        return CONSUMER.withParams(type);
     }
 }

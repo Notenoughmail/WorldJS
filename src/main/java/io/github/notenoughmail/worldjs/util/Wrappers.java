@@ -1,10 +1,8 @@
 package io.github.notenoughmail.worldjs.util;
 
 import com.mojang.serialization.Codec;
-import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.holder.HolderWrapper;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.NBTWrapper;
-import dev.latvian.mods.kubejs.script.SourceLine;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.kubejs.util.ListJS;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
@@ -45,7 +43,6 @@ import net.minecraft.world.level.levelgen.synth.BlendedNoise;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -293,6 +290,7 @@ public interface Wrappers {
         o = Wrapper.unwrapped(o);
 
         return switch (o) {
+            case SurfaceRules.RuleSource r -> r;
             case String str when str.toLowerCase(Locale.ROOT).equals("badlands") -> SurfaceRules.bandlands();
             case List<?> l -> SurfaceRules.sequence(
                     l.stream()
@@ -308,9 +306,10 @@ public interface Wrappers {
                     } else if (key(m, "block")) {
                         yield SurfaceRules.state(blockState(ctx, m.get("block")));
                     } else if (key(m , "condition")) {
+                        final Map<String, ?> inner = inner(m, ctx, "condition");
                         yield SurfaceRules.ifTrue(
-                                conditionSource(ctx, m.get("if_true"), CONDITION_SOURCE),
-                                ruleSource(ctx, m.get("then_run"), target)
+                                conditionSource(ctx, inner.get("if_true"), CONDITION_SOURCE),
+                                ruleSource(ctx, inner.get("then_run"), target)
                         );
                     }
                 }
@@ -325,6 +324,7 @@ public interface Wrappers {
         o = Wrapper.unwrapped(o);
 
         return switch (o) {
+            case SurfaceRules.ConditionSource c -> c;
             case String str -> switch (str.toLowerCase(Locale.ROOT)) {
                 case "above_preliminary_surface" -> SurfaceRules.abovePreliminarySurface();
                 case "hole" -> SurfaceRules.hole();
@@ -411,10 +411,16 @@ public interface Wrappers {
         o = Wrapper.unwrapped(o);
 
         return switch (o) {
+            case DensityFunction d -> d;
             case String str -> refFunc(ctx, str);
             case ResourceLocation resLoc -> refFunc(ctx, resLoc);
             case ResourceKey<?> key when key.isFor(Registries.DENSITY_FUNCTION) -> refFunc(ctx, key);
-            case Number num -> DensityFunctions.constant(num.doubleValue());
+            case Number num -> DensityFunctions.constant(Validations.assertRange(
+                    num.doubleValue(),
+                    -1000000.0,
+                    1000000.0,
+                    "density function"
+            ));
             case Map<?, ?> m -> {
                 if (!key(m, "type")) {
                     if (key(m, "blend_alpha")) {
@@ -433,15 +439,25 @@ public interface Wrappers {
                                 d(ctx, inner, "smear_scale_multiplier", 1, 8)
                         );
                     } else if (key(m, "interpolated")) {
-                        yield DensityFunctions.interpolated(densityFunction(ctx, m.get("interpolated"), target));
+                        yield DensityFunctions.interpolated(
+                                densityFunction(ctx, m.get("interpolated"), target)
+                        );
                     } else if (key(m, "flat_cache")) {
-                        yield DensityFunctions.flatCache(densityFunction(ctx, m.get("flat_cache"), target));
+                        yield DensityFunctions.flatCache(
+                                densityFunction(ctx, m.get("flat_cache"), target)
+                        );
                     } else if (key(m, "cache_2d")) {
-                        yield DensityFunctions.cache2d(densityFunction(ctx, m.get("cache_2d"), target));
+                        yield DensityFunctions.cache2d(
+                                densityFunction(ctx, m.get("cache_2d"), target)
+                        );
                     } else if (key(m, "cache_once")) {
-                        yield DensityFunctions.cacheOnce(densityFunction(ctx, m.get("cache_once"), target));
+                        yield DensityFunctions.cacheOnce(
+                                densityFunction(ctx, m.get("cache_once"), target)
+                        );
                     } else if (key(m, "cache_all_in_cell")) {
-                        yield DensityFunctions.cacheAllInCell(densityFunction(ctx, m.get("cache_all_in_cell"), target));
+                        yield DensityFunctions.cacheAllInCell(
+                                densityFunction(ctx, m.get("cache_all_in_cell"), target)
+                        );
                     } else if (key(m, "noise")) {
                         final Map<String, ?> inner = inner(m, ctx, "noise");
                         yield DensityFunctions.noise(
@@ -478,13 +494,21 @@ public interface Wrappers {
                                 densityFunction(ctx, inner.get("when_out_of_range"), target)
                         );
                     } else if (key(m, "shift_a")) {
-                        yield DensityFunctions.shiftA(noiseParams(ctx, m.get("shift_a")));
+                        yield DensityFunctions.shiftA(
+                                noiseParams(ctx, m.get("shift_a"))
+                        );
                     } else if (key(m, "shift_b")) {
-                        yield DensityFunctions.shiftB(noiseParams(ctx, m.get("shift_b")));
+                        yield DensityFunctions.shiftB(
+                                noiseParams(ctx, m.get("shift_b"))
+                        );
                     } else if (key(m, "shift")) {
-                        yield DensityFunctions.shift(noiseParams(ctx, m.get("shift")));
+                        yield DensityFunctions.shift(
+                                noiseParams(ctx, m.get("shift"))
+                        );
                     } else if (key(m, "blend_density")) {
-                        yield DensityFunctions.blendDensity(densityFunction(ctx, m.get("blend_density"), target));
+                        yield DensityFunctions.blendDensity(
+                                densityFunction(ctx, m.get("blend_density"), target)
+                        );
                     } else if (key(m, "clamp")) {
                         final Map<String, ?> inner = inner(m, ctx, "clamp");
                         yield densityFunction(ctx, inner.get("input"), target).clamp(
@@ -528,9 +552,11 @@ public interface Wrappers {
                                 densityFunction(ctx, inner.get("second"), target)
                         );
                     } else if (key(m, "spline")) {
-                        yield DensityFunctions.spline(densitySpline(ctx, m.get("spline")));
+                        yield DensityFunctions.spline(
+                                densitySpline(ctx, m.get("spline"))
+                        );
                     } else if (key(m, "constant")) {
-                        yield DensityFunctions.constant(d(ctx, m.get("constant")));
+                        yield densityFunction(ctx, d(ctx, m.get("constant")), target);
                     } else if (key(m, "y_clamped_gradient")) {
                         final Map<String, ?> inner = inner(m, ctx, "y_clamped_gradient");
                         yield DensityFunctions.yClampedGradient(
@@ -556,7 +582,11 @@ public interface Wrappers {
     }
 
     private static Map<String, ?> inner(Map<?, ?> m, Context ctx, String name) {
-        return Cast.to(ctx.jsToJava(m.get(name), PARSE_MAP));
+        var n = m.get(name);
+        if (n == null) {
+            throw Context.reportRuntimeError("No key '%s' in object".formatted(name), ctx);
+        }
+        return Cast.to(ctx.jsToJava(n, PARSE_MAP));
     }
 
     private static <T> T err(Context ctx, Object o, TypeInfo target) {

@@ -4,9 +4,9 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
+import io.github.notenoughmail.worldjs.WorldJS;
 import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
 import io.github.notenoughmail.worldjs.builders.base.ChunkGeneratorBuilder;
-import io.github.notenoughmail.worldjs.builders.base.SubBuilder;
 import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +18,7 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 
 import java.util.function.Consumer;
 
+@Info("Uses noise values to determine the shape and biomes of the world")
 @ReturnsSelf
 public class NoiseBasedChunkGeneratorBuilder extends ChunkGeneratorBuilder<NoiseBasedChunkGenerator> {
 
@@ -43,14 +44,7 @@ public class NoiseBasedChunkGeneratorBuilder extends ChunkGeneratorBuilder<Noise
             ResourceLocation type,
             Consumer<BiomeSourceBuilder<?>> biomeSourceBuilder
     ) {
-        biomeSource = SubBuilder.build(
-                ctx,
-                type,
-                type,
-                biomeSourceBuilder,
-                BiomeSourceBuilder.ALL_TYPES,
-                "biome source"
-        );
+        biomeSource = WorldJS.BIOME_SOURCE_TYPES.build(ctx, type, type, biomeSourceBuilder);
         return this;
     }
 

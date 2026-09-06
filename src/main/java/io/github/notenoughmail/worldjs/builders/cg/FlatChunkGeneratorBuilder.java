@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Info("A superflat world")
 @ReturnsSelf
 public class FlatChunkGeneratorBuilder extends ChunkGeneratorBuilder<FlatLevelSource> {
 

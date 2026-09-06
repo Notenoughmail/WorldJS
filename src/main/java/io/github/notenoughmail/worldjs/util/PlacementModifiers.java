@@ -9,6 +9,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import java.util.Map;
 import java.util.function.Consumer;
 
+// TODO: 1.1.x | Abstract this similarly to sub-builders
 public enum PlacementModifiers implements NamespacedScriptable<PlacementModifier> {
     INSTANCE;
 

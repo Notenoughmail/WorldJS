@@ -4,11 +4,7 @@ import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.rhino.type.JSStringConstantTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import io.github.notenoughmail.worldjs.builders.base.BiomeSourceBuilder;
-import io.github.notenoughmail.worldjs.builders.base.ChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.builders.base.SubBuilder;
-import io.github.notenoughmail.worldjs.builders.base.WorldPresetBuilder;
-import io.github.notenoughmail.worldjs.builders.cg.NoiseBasedChunkGeneratorBuilder;
 import io.github.notenoughmail.worldjs.types.assist.ClimateParameterListBuilder;
 import io.github.notenoughmail.worldjs.util.PlacementModifiers;
 import io.github.notenoughmail.worldjs.util.ServerRegistryHolderSet;
@@ -34,10 +30,7 @@ import moe.wolfgirl.probejs.typescript.transpiler.TypeConverter;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.DensityFunctions;
 import net.minecraft.world.level.levelgen.SurfaceRules;
@@ -53,7 +46,10 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,44 +57,9 @@ import static io.github.notenoughmail.worldjs.util.Types.*;
 
 public class WorldJSProbePlugin extends ProbeJSPlugin {
 
-    private static final Map<Class<?>, SubBuilderMethod<?, ?>> SUB_BUILDER_METHODS = new IdentityHashMap<>();
-
     static {
         RecordTypes.SKIP_RECORDS.add(WeightedValue.class);
         RecordTypes.SKIP_RECORDS.add(ClimateParameterListBuilder.Entry.class);
-
-        registerSubBuilderMethod(
-                WorldPresetBuilder.class,
-                "withDimension",
-                ChunkGeneratorBuilder.ALL_TYPES,
-                (entry, params) -> {
-                    params.accept("id", TypeInfo.of(ResourceKey.class).withParams(TypeInfo.of(LevelStem.class)));
-                    params.accept("dimensionType", TypeInfo.of(Holder.Reference.class).withParams(TypeInfo.of(DimensionType.class)));
-                    params.accept("generatorType", constType(entry));
-                    params.accept("generatorBuilder", consumerType(entry));
-                }
-        );
-        registerSubBuilderMethod(
-                NoiseBasedChunkGeneratorBuilder.class,
-                "biomeSource",
-                BiomeSourceBuilder.ALL_TYPES,
-                (entry, params) -> {
-                    params.accept("type", constType(entry));
-                    params.accept("biomeSourceBuilder", consumerType(entry));
-                }
-        );
-    }
-
-    public static <C, B extends SubBuilder<?>> void registerSubBuilderMethod(
-            Class<?> classWithMethod,
-            String methodName,
-            Supplier<Map<ResourceLocation, SubBuilder.SubBuilderInfo<C, ? extends B>>> map,
-            BiConsumer<
-                    Map.Entry<ResourceLocation, SubBuilder.SubBuilderInfo<C, ? extends B>>,
-                    BiConsumer<String, TypeInfo>
-                    > methodOverride
-    ) {
-        SUB_BUILDER_METHODS.put(classWithMethod, new SubBuilderMethod<>(methodName, map, methodOverride));
     }
 
     @Override
@@ -113,15 +74,16 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
                         BlockStateProvider.class,
                         VerticalAnchor.class
                 ),
-                SUB_BUILDER_METHODS.keySet()
+                SubBuilder.SUB_BUILDER_MAPS.keySet()
                         .stream(),
-                SUB_BUILDER_METHODS.values()
+                SubBuilder.SUB_BUILDER_MAPS.values()
                         .stream()
-                        .map(SubBuilderMethod::map)
+                        .flatMap(Collection::stream)
+                        .map(SubBuilder.SubBuilderMap::types)
                         .map(Supplier::get)
                         .map(Map::values)
                         .flatMap(Collection::stream)
-                        .map(SubBuilder.SubBuilderInfo::type)
+                        .map(SubBuilder.SubBuilderType::type)
                         .map(TypeInfo::asClass)
         ).flatMap(Function.identity())
                 .collect(Collectors.toSet());
@@ -519,15 +481,6 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
         r.addInputAlias(ServerRegistryHolderSet.class, Types.clazz(HolderSet.class).withParams(Types.raw("R")));
     }
 
-    record SubBuilderMethod<C, B extends SubBuilder<?>>(
-            String methodName,
-            Supplier<Map<ResourceLocation, SubBuilder.SubBuilderInfo<C, ? extends B>>> map,
-            BiConsumer<
-                    Map.Entry<ResourceLocation, SubBuilder.SubBuilderInfo<C, ? extends B>>,
-                    BiConsumer<String, TypeInfo>
-                    > methodOverride
-    ) {}
-
     private static final TypeConverter CONST_STRING_CONVERTER = new TypeConverter() {
         @Override
         public Type convertType(TypeInfo typeInfo, boolean canHaveParams, Set<String> seenVariables) {
@@ -537,14 +490,6 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             return super.convertType(typeInfo, canHaveParams, seenVariables);
         }
     };
-
-    @Override
-    public void transformClass(Documents.ClassDocument document) {
-        final SubBuilderMethod<?, ?> subBuilderMethod = SUB_BUILDER_METHODS.get(document.classInfo().clazz());
-        if (subBuilderMethod != null) {
-            handleSubBuilderMethod(document.document(), subBuilderMethod);
-        }
-    }
 
     // Can't be bothered to set up conditional mixins for an accessor
     private static final Field COMMENTABLE_CODE_COMMENTS = Util.make(() -> {
@@ -557,10 +502,10 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
         }
     });
 
-    private static <C, B extends SubBuilder<?>> void handleSubBuilderMethod(ClassDecl decl, SubBuilderMethod<C, B> subBuilderMethod) {
+    private static List<String> removeMethodAndGetComments(ClassDecl decl, String methodName) {
         final List<String> comments = new ArrayList<>();
         decl.members.removeIf(code -> {
-            if (code instanceof MethodDecl method && method.name.equals(subBuilderMethod.methodName())) {
+            if (code instanceof MethodDecl method && method.name.equals(methodName)) {
                 try {
                     comments.addAll(Cast.to(COMMENTABLE_CODE_COMMENTS.get(method)));
                 } catch (Throwable t) {
@@ -570,14 +515,35 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
             }
             return false;
         });
-        for (var entry : subBuilderMethod.map().get().entrySet()) {
-            final MethodBuilder builder = new MethodBuilder(subBuilderMethod.methodName())
+        return comments;
+    }
+
+    @Override
+    public void transformClass(Documents.ClassDocument document) {
+        final Set<SubBuilder.SubBuilderMap<?, ?, ?>> maps = SubBuilder.SUB_BUILDER_MAPS.get(document.classInfo().clazz());
+        if (maps != null) {
+            for (SubBuilder.SubBuilderMap<?, ?, ?> map : maps) {
+                handleSubBuilderMap(document.document(), map);
+            }
+        }
+    }
+
+    private static void handleSubBuilderMap(ClassDecl decl, SubBuilder.SubBuilderMap<?, ?, ?> map) {
+        final List<String> comments = removeMethodAndGetComments(decl, map.methodName());
+        for (var entry : map) {
+            final MethodBuilder builder = new MethodBuilder(map.methodName())
                     .returnType(Types.THIS);
-            subBuilderMethod.methodOverride().accept(
-                    entry,
-                    (name, typeInfo) ->
-                            builder.param(name, CONST_STRING_CONVERTER.convertType(typeInfo))
-            );
+            class Builder implements SubBuilder.ProbeMethodBuilder {
+                @Override
+                public void param(String paramName, TypeInfo paramType) {
+                    builder.param(paramName, CONST_STRING_CONVERTER.convertType(paramType));
+                }
+                @Override
+                public String id() { return entry.getKey().toString(); }
+                @Override
+                public TypeInfo type() { return entry.getValue().type(); }
+            }
+            map.methodBuilder().accept(new Builder());
             final MethodDecl method = builder.build();
             method.addComments(comments);
             decl.members.add(method);
@@ -606,14 +572,6 @@ public class WorldJSProbePlugin extends ProbeJSPlugin {
 
     private static ClassPath path(Class<?> clazz) {
         return new ClassPath(clazz);
-    }
-
-    public static TypeInfo constType(Map.Entry<ResourceLocation, ?> entry) {
-        return new JSStringConstantTypeInfo(entry.getKey().toString());
-    }
-
-    public static <I extends SubBuilder.SubBuilderInfo<?, ?>> TypeInfo consumerType(Map.Entry<?, I> entry) {
-        return TypeInfo.of(Consumer.class).withParams(entry.getValue().type());
     }
 
     static class Namespace extends Code {

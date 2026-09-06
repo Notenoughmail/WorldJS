@@ -6,6 +6,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import io.github.notenoughmail.worldjs.util.PlacementModifiers;
+import io.github.notenoughmail.worldjs.util.Validations;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -63,10 +64,7 @@ public class PlacedFeatureBuilder extends BuilderBase<PlacedFeature> {
     @Override
     public PlacedFeature createObject() {
         return new PlacedFeature(
-                Objects.requireNonNull(
-                        configuredFeature,
-                        () -> "Placed feature '%s' must define a configured feature to place".formatted(id)
-                ),
+                Validations.notNull(configuredFeature, "configuredFeature", sourceLine),
                 modifiers
         );
     }
